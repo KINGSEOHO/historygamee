@@ -10,6 +10,7 @@
   --good: #3f8f4a;
   --bad: #c0392b;
   --hud-bg: rgba(20, 16, 12, 0.72);
+  color-scheme: dark;   /* 게임 화면은 어두운 한 가지 모습으로 고정 */
 }
 
 * { box-sizing: border-box; }
