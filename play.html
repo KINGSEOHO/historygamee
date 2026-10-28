@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>역사 서바이버</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- 인게임 HUD -->
+  <div id="hud" class="hidden">
+    <div id="xpbar"><div id="xpfill"></div><span id="lvtext">Lv 1</span></div>
+    <div id="hudrow">
+      <div class="hud-box" id="hud-era">선사 시대</div>
+      <div class="hud-box big" id="hud-time">00:00</div>
+      <div class="hud-box" id="hud-kills">💀 0</div>
+      <div class="hud-box" id="hud-quiz">📖 0 / 0</div>
+    </div>
+    <div id="hpwrap"><div id="hpfill"></div><span id="hptext">100 / 100</span></div>
+    <div id="inv"></div>
+    <div id="hud-btns">
+      <button id="btn-mute" title="소리 켜기/끄기">🔊</button>
+      <button id="btn-pause" title="일시정지 (Esc)">⏸</button>
+    </div>
+  </div>
+
+  <div id="banner" class="hidden"><div id="banner-title"></div><div id="banner-sub"></div></div>
+
+  <!-- 타이틀 -->
+  <div id="screen-title" class="screen">
+    <div class="panel title-panel">
+      <div class="logo">⚔️ 역사 서바이버</div>
+      <p class="tagline">선사 시대부터 조선까지, 역사 퀴즈를 풀며 끝까지 살아남아라!</p>
+      <div class="row">
+        <span class="label">학년</span>
+        <div id="grade-btns" class="seg">
+          <button data-grade="1">1학년</button>
+          <button data-grade="2">2학년</button>
+          <button data-grade="3">3학년</button>
+        </div>
+      </div>
+      <p id="grade-desc" class="small"></p>
+      <ul class="howto">
+        <li><b>이동</b> — WASD / 방향키, 모바일은 화면을 드래그</li>
+        <li><b>공격</b> — 무기가 자동으로 공격해요</li>
+        <li><b>레벨 업</b> — 역사 퀴즈를 맞히면 강화 3개 중 선택, 틀리면 1개만!</li>
+        <li><b>목표</b> — 6개 시대를 지나 <b>6분</b> 동안 살아남기</li>
+      </ul>
+      <button id="btn-start" class="primary">게임 시작 (Enter)</button>
+      <div class="small mode">모드: 솔로</div>
+    </div>
+  </div>
+
+  <!-- 퀴즈 -->
+  <div id="screen-quiz" class="screen hidden">
+    <div class="panel quiz-panel">
+      <div class="quiz-head">
+        <span id="quiz-tag" class="tag">레벨 업!</span>
+        <span id="quiz-era" class="tag era"></span>
+        <span id="quiz-timer" class="tag timer hidden"></span>
+      </div>
+      <div id="quiz-q" class="quiz-q"></div>
+      <div id="quiz-choices" class="choices"></div>
+      <div id="quiz-result" class="result hidden">
+        <div id="quiz-verdict"></div>
+        <div id="quiz-exp"></div>
+        <button id="quiz-next" class="primary">계속 (Enter)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 강화 선택 -->
+  <div id="screen-upgrade" class="screen hidden">
+    <div class="panel up-panel">
+      <div id="up-title" class="up-title"></div>
+      <div id="up-cards" class="cards"></div>
+    </div>
+  </div>
+
+  <!-- 일시정지 -->
+  <div id="screen-pause" class="screen hidden">
+    <div class="panel">
+      <div class="logo small-logo">일시정지</div>
+      <div id="pause-inv" class="pause-inv"></div>
+      <button id="btn-resume" class="primary">계속하기 (Esc)</button>
+      <button id="btn-quit">처음으로</button>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="screen-over" class="screen hidden">
+    <div class="panel over-panel">
+      <div id="over-title" class="logo small-logo"></div>
+      <div id="over-sub" class="tagline"></div>
+      <div id="over-stats" class="stats"></div>
+      <div id="over-note-wrap" class="hidden">
+        <h3>📒 오답 노트</h3>
+        <div id="over-note" class="note"></div>
+      </div>
+      <div class="btnrow">
+        <button id="btn-retry" class="primary">다시 하기</button>
+        <button id="btn-home">처음으로</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/questions.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
