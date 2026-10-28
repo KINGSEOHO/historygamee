@@ -121,7 +121,7 @@
   const BOSS_AT = 40;     // 시대 시작 후 보스 등장 시점
   const ERAS = [
     {
-      name: '선사 시대', sub: '구석기 · 신석기 · 청동기', bg: '#34432a', line: 'rgba(0,0,0,.10)', deco: ['🌿', '🪨', '🌲'],
+      name: '선사 시대', sub: '구석기 · 신석기 · 청동기', bg: '#8d9a5c', deco: ['grass', 'grass', 'rock', 'tree', 'dolmen'],
       enemies: [
         { name: '들쥐', sprite: 'rat', hp: 7, speed: 92, dmg: 5, xp: 1, r: 12, w: 4 },
         { name: '멧돼지', sprite: 'boar', hp: 16, speed: 68, dmg: 8, xp: 2, r: 16, w: 2 },
@@ -130,7 +130,7 @@
       boss: { name: '거대 매머드', sprite: 'mammoth', hp: 420, speed: 52, dmg: 12, xp: 25, r: 46 },
     },
     {
-      name: '고조선', sub: '단군왕검 · 8조법 · 비파형 동검', bg: '#3c4630', line: 'rgba(0,0,0,.10)', deco: ['🌾', '🪨', '🌳'],
+      name: '고조선', sub: '단군왕검 · 8조법 · 비파형 동검', bg: '#b69c6c', deco: ['grass_dry', 'grass_dry', 'rock', 'dolmen'],
       enemies: [
         { name: '독사', sprite: 'snake', hp: 10, speed: 96, dmg: 6, xp: 1, r: 13, w: 3 },
         { name: '호랑이', sprite: 'tiger', hp: 20, speed: 100, dmg: 9, xp: 2, r: 18, w: 2 },
@@ -139,7 +139,7 @@
       boss: { name: '한나라 장수', sprite: 'han_general', hp: 900, speed: 60, dmg: 22, xp: 35, r: 42 },
     },
     {
-      name: '삼국 시대', sub: '고구려 · 백제 · 신라 · 가야', bg: '#45402c', line: 'rgba(0,0,0,.10)', deco: ['🌲', '⛰️', '🌾'],
+      name: '삼국 시대', sub: '고구려 · 백제 · 신라 · 가야', bg: '#9aa067', deco: ['grass', 'flowers', 'pine', 'rock'],
       enemies: [
         { name: '수나라 척후병', sprite: 'sui_scout', hp: 18, speed: 112, dmg: 9, xp: 2, r: 14, w: 3 },
         { name: '수나라 보병', sprite: 'sui_infantry', hp: 34, speed: 72, dmg: 11, xp: 3, r: 16, w: 3 },
@@ -148,7 +148,7 @@
       boss: { name: '당 태종의 친위대장', sprite: 'tang_guard', hp: 1700, speed: 64, dmg: 26, xp: 45, r: 44 },
     },
     {
-      name: '남북국 시대', sub: '통일 신라 · 발해', bg: '#2f4747', line: 'rgba(0,0,0,.12)', deco: ['🪷', '🌳', '🌊'],
+      name: '남북국 시대', sub: '통일 신라 · 발해', bg: '#7fa59a', deco: ['lotus', 'grass', 'rock', 'lotus'],
       enemies: [
         { name: '해적 선원', sprite: 'pirate', hp: 30, speed: 98, dmg: 11, xp: 2, r: 15, w: 3 },
         { name: '상어', sprite: 'shark', hp: 40, speed: 120, dmg: 13, xp: 3, r: 19, w: 2 },
@@ -157,7 +157,7 @@
       boss: { name: '해적 대선단', sprite: 'pirate_ship', hp: 2800, speed: 58, dmg: 30, xp: 55, r: 50 },
     },
     {
-      name: '고려', sub: '거란 · 여진 · 몽골의 침입', bg: '#4a3a2c', line: 'rgba(0,0,0,.12)', deco: ['🍂', '🌳', '🪨'],
+      name: '고려', sub: '거란 · 여진 · 몽골의 침입', bg: '#a88d64', deco: ['grass_dry', 'tree_autumn', 'rock', 'grass_dry'],
       enemies: [
         { name: '거란 기병', sprite: 'khitan_rider', hp: 44, speed: 122, dmg: 14, xp: 3, r: 18, w: 3 },
         { name: '몽골 군마', sprite: 'mongol_horse', hp: 54, speed: 135, dmg: 15, xp: 3, r: 19, w: 2 },
@@ -166,7 +166,7 @@
       boss: { name: '몽골 침략군 대장', sprite: 'mongol_chief', hp: 4200, speed: 62, dmg: 34, xp: 70, r: 52 },
     },
     {
-      name: '조선', sub: '훈민정음 · 임진왜란 · 수원 화성', bg: '#3b3a4a', line: 'rgba(0,0,0,.12)', deco: ['🌸', '🌳', '🪨'],
+      name: '조선', sub: '훈민정음 · 임진왜란 · 수원 화성', bg: '#97a571', deco: ['flowers', 'pine', 'grass', 'rock'],
       enemies: [
         { name: '왜군 척후병', sprite: 'wae_scout', hp: 56, speed: 130, dmg: 15, xp: 3, r: 15, w: 3 },
         { name: '왜군 조총병', sprite: 'wae_gunner', hp: 76, speed: 82, dmg: 17, xp: 4, r: 17, w: 3 },
@@ -181,65 +181,73 @@
   const HEROES = [
     { id: 'dol', name: '돌이', title: '구석기 소년', start: 'axe', perk: '이동 속도 +15%', mods: { speed: 0.15 },
       desc: '돌을 깨뜨려 만든 주먹도끼를 던지며 날쌔게 달려요.' },
+    { id: 'dangun', name: '단군왕검', title: '고조선을 세운 임금', start: 'sword', perk: '경험치 +15%', mods: { xp: 0.15 },
+      desc: '‘널리 인간을 이롭게 하라’는 홍익인간의 뜻을 품고 고조선을 세웠다고 전해져요.' },
     { id: 'jumong', name: '주몽', title: '고구려를 세운 왕', start: 'arrow', perk: '화살 +1', mods: { extraArrow: 1 },
       desc: '활을 매우 잘 쏘아 ‘주몽’이라는 이름을 얻었다고 해요.' },
-    { id: 'yusin', name: '김유신', title: '신라의 화랑 · 장군', start: 'sword', perk: '최대 체력 +30, 받는 피해 -1', mods: { hp: 30, armor: 1 },
+    { id: 'yusin', name: '김유신', title: '신라의 화랑 · 장군', start: 'bell', perk: '최대 체력 +30, 받는 피해 -1', mods: { hp: 30, armor: 1 },
       desc: '화랑 출신 장군으로, 신라의 삼국 통일에 앞장섰어요.' },
-    { id: 'sejong', name: '세종대왕', title: '조선 제4대 왕', start: 'bell', perk: '경험치 +20%', mods: { xp: 0.2 },
-      desc: '훈민정음을 만들고, 박연과 함께 궁중 음악을 정리했어요.' },
-    { id: 'sunsin', name: '이순신', title: '조선 수군의 장수', start: 'rocket', perk: '공격력 +15%', mods: { dmg: 0.15 },
+    { id: 'sejong', name: '세종대왕', title: '조선 제4대 왕', start: 'rocket', perk: '재사용 대기시간 -10%', mods: { cd: 0.1 },
+      desc: '훈민정음을 만들고, 신기전·측우기 같은 과학 기술을 발전시켰어요.' },
+    { id: 'sunsin', name: '이순신', title: '조선 수군의 장수', start: 'gun', perk: '공격력 +15%', mods: { dmg: 0.15 },
       desc: '임진왜란 때 거북선과 함께 바다를 지켜 낸 장수예요.' },
   ];
   const heroById = id => HEROES.find(h => h.id === id) || HEROES[0];
-  let heroId = 'jumong';
+  let heroId = 'dangun';
   try { heroId = heroById(localStorage.getItem('hs-hero') || heroId).id; } catch (e) { /* 저장소를 쓸 수 없으면 기본값 */ }
 
   // ── 강화(무기/유물) 정의 ─────────────────────────────
   const MAX_LV = 5;
   const UPGRADES = {
     arrow: {
-      type: 'w', name: '활', emoji: '🏹',
+      type: 'w', name: '활', icon: 'ic_bow', emoji: '🏹',
       tip: '고구려의 주몽은 활을 매우 잘 쏘았다고 해요.',
       desc: ['가장 가까운 적에게 화살을 쏩니다.', '피해량 증가, 화살 +1', '연사 속도 증가', '화살이 적 2명을 관통', '화살 +1, 피해량 증가'],
       stat: lv => ({ cd: 1.0 - 0.08 * lv, n: lv >= 5 ? 3 : lv >= 2 ? 2 : 1, dmg: 10 + 4 * lv, pierce: lv >= 4 ? 2 : 1, spd: 480 }),
     },
     axe: {
-      type: 'w', name: '주먹도끼', emoji: '🪓',
+      type: 'w', name: '주먹도끼', icon: 'handaxe', emoji: '🪓',
       tip: '주먹도끼는 구석기 시대의 대표적인 뗀석기예요.',
       desc: ['위로 던진 도끼가 떨어지며 적을 관통합니다.', '피해량 증가', '도끼 +1', '피해량 증가, 쿨타임 감소', '도끼 +1'],
       stat: lv => ({ cd: 1.8 - 0.12 * lv, n: lv >= 5 ? 3 : lv >= 3 ? 2 : 1, dmg: 22 + 8 * lv, size: 26 + lv * 2 }),
     },
     sword: {
-      type: 'w', name: '비파형 동검', emoji: '🗡️',
+      type: 'w', name: '비파형 동검', icon: 'ic_bipa', emoji: '🗡️',
       tip: '비파형 동검은 고조선의 문화 범위를 보여 주는 청동기 유물이에요.',
       desc: ['바라보는 방향을 넓게 베어냅니다.', '범위·피해량 증가', '앞뒤 동시 베기', '피해량 증가', '범위 대폭 증가'],
       stat: lv => ({ cd: 1.35 - 0.08 * lv, dmg: 18 + 7 * lv, w: 110 + 14 * lv + (lv >= 5 ? 40 : 0), h: 52 + (lv >= 5 ? 16 : 0), both: lv >= 3 }),
     },
     mirror: {
-      type: 'w', name: '청동 거울', emoji: '🪞',
+      type: 'w', name: '청동 거울', icon: 'mirror', emoji: '🪞',
       tip: '청동 거울은 청동기 시대 지배자가 제사 때 사용했어요.',
       desc: ['주위를 도는 거울이 닿는 적을 공격합니다.', '거울 +1', '회전 속도·피해량 증가', '거울 +1', '거울 +1, 반경 증가'],
       stat: lv => ({ n: [0, 2, 3, 3, 4, 5][lv], rad: 78 + (lv >= 5 ? 22 : 4 * lv), spd: 2.6 + 0.3 * lv, dmg: 9 + 4 * lv }),
     },
     bell: {
-      type: 'w', name: '성덕대왕신종', emoji: '🔔',
+      type: 'w', name: '성덕대왕신종', icon: 'ic_bell', emoji: '🔔',
       tip: '에밀레종이라고도 불리는 통일 신라의 범종이에요.',
       desc: ['종소리 파동이 주변 적 모두에게 피해를 줍니다.', '범위 증가', '피해량 증가', '울리는 간격 감소', '범위·피해량 대폭 증가'],
       stat: lv => ({ r: 96 + 14 * lv + (lv >= 5 ? 20 : 0), tick: lv >= 4 ? 0.8 : 1.0, dmg: 10 + 4 * lv + (lv >= 5 ? 6 : 0) }),
     },
     rocket: {
-      type: 'w', name: '신기전', emoji: '🚀',
+      type: 'w', name: '신기전', icon: 'ic_rocket', emoji: '🚀',
       tip: '신기전은 조선 세종 때 만든 로켓 화살 무기예요.',
       desc: ['여러 발의 로켓이 날아가 폭발합니다.', '로켓 +1', '폭발 범위 증가', '로켓 +1, 쿨타임 감소', '로켓 +2, 피해량 증가'],
       stat: lv => ({ cd: 2.8 - 0.2 * lv, n: 1 + lv + (lv >= 5 ? 1 : 0), dmg: 24 + 8 * lv, ar: 54 + 7 * lv }),
     },
-    shoes: { type: 'p', name: '짚신', emoji: '👡', tip: '볏짚으로 엮어 만든 옛 신발이에요.', desc: ['이동 속도 +10%'] },
-    armor: { type: 'p', name: '갑옷', emoji: '🛡️', tip: '가야는 철로 만든 갑옷으로 유명했어요.', desc: ['받는 피해 -1'] },
-    jige: { type: 'p', name: '보부상 지게', emoji: '🎒', tip: '보부상은 장터를 돌며 물건을 팔던 상인이에요.', desc: ['경험치 획득 범위 +35%'] },
-    book: { type: 'p', name: '서책', emoji: '📜', tip: '조선의 선비들은 서원과 향교에서 공부했어요.', desc: ['경험치 획득량 +10%'] },
-    ginseng: { type: 'p', name: '인삼', emoji: '🌱', tip: '고려 인삼은 외국에서도 인기 있는 특산물이었어요.', desc: ['최대 체력 +20, 초당 체력 0.5 회복'] },
-    powder: { type: 'p', name: '화약', emoji: '💥', tip: '고려 말 최무선은 화약을 만들어 왜구를 물리쳤어요.', desc: ['모든 공격 피해량 +12%'] },
-    sundial: { type: 'p', name: '앙부일구', emoji: '☀️', tip: '앙부일구는 세종 때 만든 솥 모양 해시계예요.', desc: ['모든 무기 재사용 대기시간 -8%'] },
+    gun: {
+      type: 'w', name: '승자총통', icon: 'chongtong',
+      tip: '승자총통은 조선 시대에 쓰인, 손에 들고 쏘는 화기예요.',
+      desc: ['가까운 적에게 무거운 탄환을 쏴 여럿을 꿰뚫습니다.', '피해량 증가', '탄환 +1', '관통 +2, 쿨타임 감소', '탄환 +1, 피해량 증가'],
+      stat: lv => ({ cd: 1.55 - 0.1 * lv, n: lv >= 5 ? 3 : lv >= 3 ? 2 : 1, dmg: 26 + 9 * lv + (lv >= 5 ? 8 : 0), pierce: lv >= 4 ? 5 : 3, spd: 560 }),
+    },
+    shoes: { type: 'p', name: '짚신', icon: 'ic_shoes', emoji: '👡', tip: '볏짚으로 엮어 만든 옛 신발이에요.', desc: ['이동 속도 +10%'] },
+    armor: { type: 'p', name: '갑옷', icon: 'ic_armor', emoji: '🛡️', tip: '가야는 철로 만든 갑옷으로 유명했어요.', desc: ['받는 피해 -1'] },
+    jige: { type: 'p', name: '보부상 지게', icon: 'ic_jige', emoji: '🎒', tip: '보부상은 장터를 돌며 물건을 팔던 상인이에요.', desc: ['경험치 획득 범위 +35%'] },
+    book: { type: 'p', name: '서책', icon: 'ic_scroll', emoji: '📜', tip: '조선의 선비들은 서원과 향교에서 공부했어요.', desc: ['경험치 획득량 +10%'] },
+    ginseng: { type: 'p', name: '인삼', icon: 'ic_ginseng', emoji: '🌱', tip: '고려 인삼은 외국에서도 인기 있는 특산물이었어요.', desc: ['최대 체력 +20, 초당 체력 0.5 회복'] },
+    powder: { type: 'p', name: '화약', icon: 'ic_powder', emoji: '💥', tip: '고려 말 최무선은 화약을 만들어 왜구를 물리쳤어요.', desc: ['모든 공격 피해량 +12%'] },
+    sundial: { type: 'p', name: '앙부일구', icon: 'ic_sundial', emoji: '☀️', tip: '앙부일구는 세종 때 만든 솥 모양 해시계예요.', desc: ['모든 무기 재사용 대기시간 -8%'] },
   };
   const WEAPON_IDS = Object.keys(UPGRADES).filter(k => UPGRADES[k].type === 'w');
 
@@ -280,7 +288,7 @@
     p.maxHp = 100 + 20 * (G.passives.ginseng || 0) + (m.hp || 0);
     p.regen = 0.5 * (G.passives.ginseng || 0);
     p.dmgMul = 1 + 0.12 * (G.passives.powder || 0) + (m.dmg || 0);
-    p.cdMul = 1 - 0.08 * (G.passives.sundial || 0);
+    p.cdMul = 1 - 0.08 * (G.passives.sundial || 0) - (m.cd || 0);
     if (p.maxHp > oldMax) p.hp += p.maxHp - oldMax;
     p.hp = Math.min(p.hp, p.maxHp);
   }
@@ -427,8 +435,8 @@
     }
     G.gems.push({ x: e.x, y: e.y, v: e.xp });
     const r = Math.random();
-    if (r < 0.012) G.items.push({ kind: 'food', x: e.x, y: e.y, emoji: '🍡' });
-    else if (r < 0.016) G.items.push({ kind: 'magnet', x: e.x, y: e.y, emoji: '🧲' });
+    if (r < 0.012) G.items.push({ kind: 'food', x: e.x, y: e.y, emoji: '' });
+    else if (r < 0.016) G.items.push({ kind: 'magnet', x: e.x, y: e.y, emoji: '' });
     if (G.gems.length > 500) mergeGems();
   }
 
@@ -477,6 +485,18 @@
         }
         G.fx.push({ k: 'slash', x: p.x, y: p.y, dir, w: s.w, h: s.h, life: 0.2, max: 0.2 });
       }
+    },
+    gun(s) {
+      const p = G.player;
+      const t = nearestEnemy(p.x, p.y, 600);
+      const ang = t ? Math.atan2(t.y - p.y, t.x - p.x) : Math.atan2(p.fy, p.fx);
+      for (let i = 0; i < s.n; i++) {
+        const a = ang + (i - (s.n - 1) / 2) * 0.1;
+        G.projs.push({ k: 'shot', x: p.x, y: p.y, vx: Math.cos(a) * s.spd, vy: Math.sin(a) * s.spd,
+          dmg: s.dmg, pierce: s.pierce, life: 1.2, r: 7, hit: new Set() });
+      }
+      G.fx.push({ k: 'smoke', x: p.x + Math.cos(ang) * 18, y: p.y + Math.sin(ang) * 18, life: 0.45, max: 0.45, big: true });
+      SFX.boom();
     },
     rocket(s) {
       const p = G.player;
@@ -734,6 +754,32 @@
     return (h ^ (h >>> 16)) >>> 0;
   }
 
+  // 시대마다 바닥 색에 어울리는 얼룩을 찍은 타일(2px 단위 픽셀)
+  const tiles = {};
+  function groundTile(era) {
+    if (tiles[era]) return tiles[era];
+    const S = 128, c = document.createElement('canvas');
+    c.width = c.height = S;
+    const t = c.getContext('2d');
+    t.fillStyle = ERAS[era].bg;
+    t.fillRect(0, 0, S, S);
+    let seed = 1234 + era * 777;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const base = ERAS[era].bg;
+    const tone = amt => {
+      const n = parseInt(base.slice(1), 16), f = v => clamp(Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt), 0, 255);
+      return `rgb(${f(n >> 16 & 255)},${f(n >> 8 & 255)},${f(n & 255)})`;
+    };
+    const tones = [tone(-0.07), tone(-0.12), tone(0.08), tone(-0.04)];
+    for (let i = 0; i < 160; i++) {
+      t.fillStyle = tones[i % tones.length];
+      const x = Math.floor(rnd() * 64) * 2, y = Math.floor(rnd() * 64) * 2;
+      t.fillRect(x, y, rnd() < 0.3 ? 4 : 2, 2);
+    }
+    tiles[era] = c;
+    return c;
+  }
+
   function render() {
     const era = ERAS[Math.max(0, G ? G.era : 0)];
     ctx.fillStyle = era.bg;
@@ -743,24 +789,23 @@
     let cx = p.x - VW / 2, cy = p.y - VH / 2;
     if (G.shake > 0) { cx += rand(-5, 5) * G.shake * 2; cy += rand(-5, 5) * G.shake * 2; }
 
-    // 바닥 격자와 장식
-    const T = 64;
-    ctx.strokeStyle = era.line;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let x = Math.floor(cx / T) * T; x < cx + VW; x += T) { ctx.moveTo(x - cx, 0); ctx.lineTo(x - cx, VH); }
-    for (let y = Math.floor(cy / T) * T; y < cy + VH; y += T) { ctx.moveTo(0, y - cy); ctx.lineTo(VW, y - cy); }
-    ctx.stroke();
+    // 바닥: 픽셀 얼룩 타일을 깔고, 장식은 칸마다 정해진 자리에 놓는다
+    const tile = groundTile(Math.max(0, G.era));
+    const TS = tile.width;
+    const ox = Math.floor(cx / TS) * TS, oy = Math.floor(cy / TS) * TS;
+    ctx.imageSmoothingEnabled = false;
+    for (let x = ox; x < cx + VW; x += TS) {
+      for (let y = oy; y < cy + VH; y += TS) ctx.drawImage(tile, Math.round(x - cx), Math.round(y - cy));
+    }
     const D = 128;
-    ctx.globalAlpha = 0.4;
-    for (let gx = Math.floor(cx / D) - 1; gx < (cx + VW) / D + 1; gx++) {
-      for (let gy = Math.floor(cy / D) - 1; gy < (cy + VH) / D + 1; gy++) {
+    for (let gy = Math.floor(cy / D) - 1; gy < (cy + VH) / D + 1; gy++) {
+      for (let gx = Math.floor(cx / D) - 1; gx < (cx + VW) / D + 1; gx++) {
         const h = hash(gx, gy);
-        if (h % 5 !== 0) continue;
-        drawEmoji(era.deco[(h >>> 4) % era.deco.length], gx * D + (h >>> 8) % D - cx, gy * D + (h >>> 16) % D - cy, 22);
+        if (h % 4 !== 0) continue;
+        const key = era.deco[(h >>> 4) % era.deco.length];
+        Sprites.draw(ctx, key, Math.round(gx * D + (h >>> 8) % D - cx), Math.round(gy * D + (h >>> 16) % D - cy), key === 'dolmen' ? 1.5 : key.startsWith('grass') || key === 'flowers' ? 1.5 : 1.1);
       }
     }
-    ctx.globalAlpha = 1;
 
     ctx.save();
     ctx.translate(-cx, -cy);
@@ -773,15 +818,12 @@
       ctx.beginPath(); ctx.arc(p.x, p.y, s.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     }
 
-    // 경험치 구슬
+    // 경험치 곡옥
     for (const g of G.gems) {
       if (Math.abs(g.x - p.x) > VW / 2 + 20 || Math.abs(g.y - p.y) > VH / 2 + 20) continue;
-      const s = g.v >= 10 ? 8 : g.v >= 3 ? 6.5 : 5;
-      ctx.fillStyle = g.v >= 10 ? '#ff5d5d' : g.v >= 3 ? '#5ee07a' : '#59b8ff';
-      ctx.beginPath();
-      ctx.moveTo(g.x, g.y - s); ctx.lineTo(g.x + s * 0.75, g.y); ctx.lineTo(g.x, g.y + s); ctx.lineTo(g.x - s * 0.75, g.y);
-      ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 1; ctx.stroke();
+      if (g.v >= 10) Sprites.draw(ctx, 'gogok_r', g.x, g.y, 1.3);
+      else if (g.v >= 3) Sprites.draw(ctx, 'gogok_g', g.x, g.y, 1.1);
+      else Sprites.draw(ctx, 'gogok_b', g.x, g.y, 0.9);
     }
 
     // 아이템
@@ -791,7 +833,7 @@
         ctx.fillStyle = 'rgba(0,0,0,.25)';
         ctx.beginPath(); ctx.ellipse(it.x, it.y + 14, 15, 4, 0, 0, Math.PI * 2); ctx.fill();
         Sprites.draw(ctx, 'chest', it.x, it.y + bob * 0.5, 1.05, G.t * 0.8);
-      } else drawEmoji(it.emoji, it.x, it.y + bob, 24);
+      } else Sprites.draw(ctx, it.kind === 'food' ? 'songpyeon' : 'magnet', it.x, it.y + bob, 0.95);
     }
 
     // 적과 플레이어 — 그림자를 먼저 깔고, 아래쪽에 있는 캐릭터가 앞에 오도록 y 순서로 그린다
@@ -799,7 +841,7 @@
     for (const e of G.enemies) {
       if (Math.abs(e.x - p.x) > VW / 2 + 120 || Math.abs(e.y - p.y) > VH / 2 + 120) continue;
       const info = Sprites.info(e.sprite);
-      const sc = e.r / 16 * (info.mul || 0.82);
+      const sc = e.r / 16 * (info.mul || 0.95);
       const sy = e.y + (info.shadowY || 22) * sc;
       if (e.boss) {
         const glow = ctx.createRadialGradient(e.x, sy, 0, e.x, sy, e.r * 1.3);
@@ -860,6 +902,15 @@
         ctx.fillStyle = '#d9534f';
         ctx.fillRect(-15, -3, 4, 6);
         ctx.restore();
+      } else if (pr.k === 'shot') {
+        ctx.fillStyle = 'rgba(80,80,80,.35)';
+        ctx.beginPath(); ctx.arc(pr.x - pr.vx * 0.02, pr.y - pr.vy * 0.02, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#24160d';
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, 5.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#5a5a62';
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#b8b8c0';
+        ctx.fillRect(Math.round(pr.x - 2), Math.round(pr.y - 2), 2, 2);
       } else if (pr.k === 'axe') {
         Sprites.draw(ctx, 'handaxe', pr.x, pr.y, pr.size / 24, 0, false, false, pr.rot);
       } else if (pr.k === 'rocket') {
@@ -909,7 +960,7 @@
         ctx.beginPath(); ctx.arc(f.x, f.y, f.r * (1.1 - 0.4 * k), 0, Math.PI * 2); ctx.fill();
       } else if (f.k === 'smoke') {
         ctx.fillStyle = `rgba(200,200,200,${0.35 * k})`;
-        ctx.beginPath(); ctx.arc(f.x, f.y, 3 + (1 - k) * 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(f.x, f.y, (3 + (1 - k) * 4) * (f.big ? 2.2 : 1), 0, Math.PI * 2); ctx.fill();
       }
     }
 
@@ -971,14 +1022,18 @@
     hud.hp.style.width = `${clamp(p.hp / p.maxHp, 0, 1) * 100}%`;
   }
   function updateHudEra() { setText(hud.era, 'era', `${ERAS[G.era].name} (${G.era + 1}/${ERAS.length})`); }
+  function iconHtml(id) {
+    const u = UPGRADES[id];
+    return u.icon ? `<img class="px-icon" src="${Sprites.iconURL(u.icon)}" alt="">` : u.emoji;
+  }
   function invHtml(withNames) {
     const list = [
       ...Object.keys(G.weapons).map(id => [id, G.weapons[id], 'weapon']),
       ...Object.keys(G.passives).map(id => [id, G.passives[id], 'passive']),
     ];
     return list.map(([id, lv, cls]) => withNames
-      ? `<span class="inv-item ${cls}">${UPGRADES[id].emoji} ${UPGRADES[id].name} Lv${lv}</span>`
-      : `<div class="inv-item ${cls}" title="${UPGRADES[id].name}">${UPGRADES[id].emoji}<b>${lv}</b></div>`).join('');
+      ? `<span class="inv-item ${cls}">${iconHtml(id)} ${UPGRADES[id].name} Lv${lv}</span>`
+      : `<div class="inv-item ${cls}" title="${UPGRADES[id].name}">${iconHtml(id)}<b>${lv}</b></div>`).join('');
   }
   function updateInv() { hud.inv.innerHTML = invHtml(false); }
 
@@ -1152,11 +1207,11 @@
       const b = document.createElement('button');
       b.className = 'card';
       if (id === 'heal') {
-        b.innerHTML = `<div class="emoji">🍡</div><div class="name">떡</div><div class="desc">모든 강화를 마쳤어요! 체력을 모두 회복합니다.</div><div class="key">[${i + 1}]</div>`;
+        b.innerHTML = `<div class="emoji"><img class="px-icon" src="${Sprites.iconURL('songpyeon')}" alt=""></div><div class="name">송편</div><div class="desc">모든 강화를 마쳤어요! 체력을 모두 회복합니다.</div><div class="key">[${i + 1}]</div>`;
       } else {
         const u = UPGRADES[id], lv = lvOf(id);
         const desc = u.type === 'w' ? u.desc[lv] : u.desc[0];
-        b.innerHTML = `<div class="emoji">${u.emoji}</div>
+        b.innerHTML = `<div class="emoji">${iconHtml(id)}</div>
           <div class="name">${u.name}</div>
           <div class="lv ${lv ? '' : 'new'}">${lv ? `Lv ${lv} → ${lv + 1}` : 'NEW'}</div>
           <div class="desc">${desc}</div>
@@ -1246,7 +1301,7 @@
     $('hero-name').textContent = h.name;
     $('hero-title').textContent = h.title;
     $('hero-desc').textContent = h.desc;
-    $('hero-weapon').textContent = `시작 무기 ${UPGRADES[h.start].emoji} ${UPGRADES[h.start].name}`;
+    $('hero-weapon').innerHTML = `시작 무기 ${iconHtml(h.start)} ${UPGRADES[h.start].name}`;
     $('hero-perk').textContent = `특성 · ${h.perk}`;
   }
   function drawHeroPortraits(t) {
