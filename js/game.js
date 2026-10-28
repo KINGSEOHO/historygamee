@@ -17,7 +17,8 @@
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const params = new URLSearchParams(location.search);
-  let grade = clamp(parseInt(params.get('grade'), 10) || 1, 1, 3);
+  let unit = clamp(parseInt(params.get('unit'), 10) || 3, 1, 3);   // 배운 단원 범위
+  let level = params.get('lv') === '2' ? 2 : 1;                       // 1 기본, 2 도전
 
   // ── 캔버스 ────────────────────────────────────────────
   const canvas = $('game');
@@ -117,65 +118,87 @@
   })();
 
   // ── 시대 / 적 ─────────────────────────────────────────
-  const ERA_LEN = 60;     // 시대 하나의 길이(초)
-  const BOSS_AT = 40;     // 시대 시작 후 보스 등장 시점
+  // 초등 5학년 2학기 사회(2022 개정) 한국사 단원 흐름을 따른다. unit: 이 시대가 속한 단원
   const ERAS = [
     {
-      name: '선사 시대', sub: '구석기 · 신석기 · 청동기', bg: '#8d9a5c', deco: ['grass', 'grass', 'rock', 'tree', 'dolmen'],
+      name: '선사·고조선', sub: '주먹도끼 · 고인돌 · 단군왕검', unit: 1, std: '6사04-01',
+      bg: '#b69c6c', deco: ['grass_dry', 'grass', 'rock', 'dolmen'],
       enemies: [
-        { name: '들쥐', sprite: 'rat', hp: 7, speed: 92, dmg: 5, xp: 1, r: 12, w: 4 },
+        { name: '들쥐', sprite: 'rat', hp: 7, speed: 92, dmg: 5, xp: 1, r: 12, w: 3 },
         { name: '멧돼지', sprite: 'boar', hp: 16, speed: 68, dmg: 8, xp: 2, r: 16, w: 2 },
         { name: '늑대', sprite: 'wolf', hp: 12, speed: 108, dmg: 7, xp: 2, r: 15, w: 1 },
+        { name: '한나라 병사', sprite: 'han_soldier', hp: 22, speed: 70, dmg: 9, xp: 3, r: 16, w: 2 },
       ],
-      boss: { name: '거대 매머드', sprite: 'mammoth', hp: 420, speed: 52, dmg: 12, xp: 25, r: 46 },
+      boss: { name: '한나라 장수', sprite: 'han_general', hp: 420, speed: 55, dmg: 12, xp: 25, r: 42 },
     },
     {
-      name: '고조선', sub: '단군왕검 · 8조법 · 비파형 동검', bg: '#b69c6c', deco: ['grass_dry', 'grass_dry', 'rock', 'dolmen'],
-      enemies: [
-        { name: '독사', sprite: 'snake', hp: 10, speed: 96, dmg: 6, xp: 1, r: 13, w: 3 },
-        { name: '호랑이', sprite: 'tiger', hp: 20, speed: 100, dmg: 9, xp: 2, r: 18, w: 2 },
-        { name: '한나라 병사', sprite: 'han_soldier', hp: 26, speed: 70, dmg: 9, xp: 3, r: 16, w: 2 },
-      ],
-      boss: { name: '한나라 장수', sprite: 'han_general', hp: 900, speed: 60, dmg: 22, xp: 35, r: 42 },
-    },
-    {
-      name: '삼국 시대', sub: '고구려 · 백제 · 신라 · 가야', bg: '#9aa067', deco: ['grass', 'flowers', 'pine', 'rock'],
+      name: '삼국·가야', sub: '고구려 · 백제 · 신라 · 가야', unit: 1, std: '6사04-02',
+      bg: '#9aa067', deco: ['grass', 'flowers', 'pine', 'rock'],
       enemies: [
         { name: '수나라 척후병', sprite: 'sui_scout', hp: 18, speed: 112, dmg: 9, xp: 2, r: 14, w: 3 },
-        { name: '수나라 보병', sprite: 'sui_infantry', hp: 34, speed: 72, dmg: 11, xp: 3, r: 16, w: 3 },
-        { name: '당나라 기병', sprite: 'tang_rider', hp: 30, speed: 125, dmg: 12, xp: 3, r: 18, w: 2 },
+        { name: '수나라 보병', sprite: 'sui_infantry', hp: 30, speed: 72, dmg: 10, xp: 3, r: 16, w: 3 },
+        { name: '당나라 기병', sprite: 'tang_rider', hp: 28, speed: 125, dmg: 11, xp: 3, r: 18, w: 2 },
       ],
-      boss: { name: '당 태종의 친위대장', sprite: 'tang_guard', hp: 1700, speed: 64, dmg: 26, xp: 45, r: 44 },
+      boss: { name: '당 태종의 친위대장', sprite: 'tang_guard', hp: 900, speed: 60, dmg: 22, xp: 35, r: 44 },
     },
     {
-      name: '남북국 시대', sub: '통일 신라 · 발해', bg: '#7fa59a', deco: ['lotus', 'grass', 'rock', 'lotus'],
+      name: '통일 신라·발해', sub: '불국사 · 해동성국 · 청해진', unit: 1, std: '6사04-02',
+      bg: '#7fa59a', deco: ['lotus', 'grass', 'rock', 'lotus'],
       enemies: [
         { name: '해적 선원', sprite: 'pirate', hp: 30, speed: 98, dmg: 11, xp: 2, r: 15, w: 3 },
         { name: '상어', sprite: 'shark', hp: 40, speed: 120, dmg: 13, xp: 3, r: 19, w: 2 },
         { name: '거대 문어', sprite: 'octopus', hp: 60, speed: 66, dmg: 14, xp: 4, r: 20, w: 2 },
       ],
-      boss: { name: '해적 대선단', sprite: 'pirate_ship', hp: 2800, speed: 58, dmg: 30, xp: 55, r: 50 },
+      boss: { name: '해적 대선단', sprite: 'pirate_ship', hp: 1700, speed: 58, dmg: 26, xp: 45, r: 50 },
     },
     {
-      name: '고려', sub: '거란 · 여진 · 몽골의 침입', bg: '#a88d64', deco: ['grass_dry', 'tree_autumn', 'rock', 'grass_dry'],
+      name: '고려', sub: '청자 · 팔만대장경 · 금속 활자', unit: 1, std: '6사04-03',
+      bg: '#a88d64', deco: ['grass_dry', 'tree_autumn', 'rock', 'grass_dry'],
       enemies: [
         { name: '거란 기병', sprite: 'khitan_rider', hp: 44, speed: 122, dmg: 14, xp: 3, r: 18, w: 3 },
         { name: '몽골 군마', sprite: 'mongol_horse', hp: 54, speed: 135, dmg: 15, xp: 3, r: 19, w: 2 },
         { name: '몽골 사냥매', sprite: 'eagle', hp: 32, speed: 150, dmg: 12, xp: 3, r: 15, w: 2 },
       ],
-      boss: { name: '몽골 침략군 대장', sprite: 'mongol_chief', hp: 4200, speed: 62, dmg: 34, xp: 70, r: 52 },
+      boss: { name: '몽골 침략군 대장', sprite: 'mongol_chief', hp: 2800, speed: 62, dmg: 30, xp: 55, r: 52 },
     },
     {
-      name: '조선', sub: '훈민정음 · 임진왜란 · 수원 화성', bg: '#97a571', deco: ['flowers', 'pine', 'grass', 'rock'],
+      name: '조선', sub: '유교 문화 · 훈민정음 · 임진왜란', unit: 2, std: '6사05-01',
+      bg: '#97a571', deco: ['flowers', 'pine', 'grass', 'rock'],
       enemies: [
         { name: '왜군 척후병', sprite: 'wae_scout', hp: 56, speed: 130, dmg: 15, xp: 3, r: 15, w: 3 },
         { name: '왜군 조총병', sprite: 'wae_gunner', hp: 76, speed: 82, dmg: 17, xp: 4, r: 17, w: 3 },
         { name: '왜선', sprite: 'wae_ship', hp: 110, speed: 70, dmg: 20, xp: 5, r: 22, w: 1 },
       ],
-      boss: { name: '왜군 대함대', sprite: 'wae_fleet', hp: 6500, speed: 55, dmg: 40, xp: 90, r: 56 },
+      boss: { name: '왜군 대함대', sprite: 'wae_fleet', hp: 4200, speed: 55, dmg: 34, xp: 70, r: 56 },
+    },
+    {
+      name: '조선 후기·개항기', sub: '실학 · 서민 문화 · 근대 문물', unit: 2, std: '6사05-02',
+      bg: '#a59c78', deco: ['grass', 'pine', 'rock', 'flowers'],
+      enemies: [
+        { name: '프랑스 군인(병인양요)', sprite: 'french_soldier', hp: 66, speed: 100, dmg: 16, xp: 4, r: 16, w: 3 },
+        { name: '미국 해병(신미양요)', sprite: 'us_marine', hp: 80, speed: 92, dmg: 18, xp: 4, r: 16, w: 3 },
+        { name: '이양선', sprite: 'west_boat', hp: 120, speed: 72, dmg: 21, xp: 5, r: 22, w: 1 },
+      ],
+      boss: { name: '서양 함대', sprite: 'steamship', hp: 5400, speed: 55, dmg: 38, xp: 80, r: 56 },
+    },
+    {
+      name: '일제 강점기·광복', sub: '3·1 운동 · 임시 정부 · 8·15 광복', unit: 3, std: '6사06-01',
+      bg: '#9c9480', deco: ['grass_dry', 'rock', 'grass', 'tree'],
+      enemies: [
+        { name: '일본군 보병', sprite: 'jp_soldier', hp: 76, speed: 96, dmg: 17, xp: 4, r: 16, w: 3 },
+        { name: '일본 헌병', sprite: 'jp_mp', hp: 90, speed: 104, dmg: 18, xp: 4, r: 16, w: 2 },
+        { name: '일본군 기병', sprite: 'jp_rider', hp: 84, speed: 128, dmg: 19, xp: 5, r: 18, w: 2 },
+      ],
+      boss: { name: '일본군 사령관', sprite: 'jp_officer', hp: 6500, speed: 58, dmg: 40, xp: 90, r: 52 },
     },
   ];
-  const GOAL = ERA_LEN * ERAS.length;
+  const GOAL = 360;                     // 한 판 6분. 고른 단원 범위의 시대들이 이 시간을 나눠 갖는다
+  const UNITS = {
+    1: { label: '1단원', desc: '1단원 「유적과 유물로 살펴본 옛 사람들의 생활」' },
+    2: { label: '1~2단원', desc: '1단원 + 2단원 「달라지는 시대, 변화하는 생활 모습」' },
+    3: { label: '1~3단원', desc: '1~2단원 + 3단원 「식민 통치와 저항, 전쟁이 바꾼 사회와 생활」' },
+  };
+  const erasFor = unit => ERAS.filter(e => e.unit <= unit).length;
 
   // ── 영웅 ──────────────────────────────────────────────
   const HEROES = [
@@ -260,7 +283,7 @@
 
   function newGame() {
     G = {
-      t: 0, era: -1, kills: 0, level: 1, xp: 0, xpNeed: xpFor(1), pendingLv: 0, pendingChest: 0,
+      t: 0, era: -1, eraCount: erasFor(unit), eraLen: GOAL / erasFor(unit), kills: 0, level: 1, xp: 0, xpNeed: xpFor(1), pendingLv: 0, pendingChest: 0,
       player: {
         x: 0, y: 0, r: 15, hp: 100, maxHp: 100, baseSpeed: 165, speed: 165, armor: 0, magnet: 70,
         regen: 0, dmgMul: 1, cdMul: 1, xpMul: 1, inv: 0, fx: 1, fy: 0, face: 1, anim: 0,
@@ -269,7 +292,7 @@
       weapons: { [heroById(heroId).start]: 1 }, passives: {}, timers: {},
       enemies: [], projs: [], gems: [], items: [], fx: [], texts: [],
       spawnT: 1, waveT: 25, bossSpawned: {}, mirrorAng: 0,
-      quizRight: 0, quizTotal: 0, wrongNote: [], usedQ: new Set(),
+      quizRight: 0, quizTotal: 0, wrongNote: [], usedQ: new Set(), stdStats: {},
       bossesKilled: 0, shake: 0,
     };
     recomputeStats();
@@ -328,7 +351,7 @@
     else if (state === 'play' && (e.code === 'Escape' || e.code === 'KeyP')) pauseGame();
     else if (state === 'paused' && (e.code === 'Escape' || e.code === 'KeyP')) resumeGame();
     else if (state === 'quiz') {
-      if (quiz && !quiz.answered && n !== undefined) answerQuiz(n);
+      if (quiz && !quiz.answered && n !== undefined && n < quiz.order.length) answerQuiz(n);
       else if (quiz && quiz.answered && confirm) afterQuiz();
     } else if (state === 'upgrade' && n !== undefined) {
       const btn = $('up-cards').children[n];
@@ -686,14 +709,14 @@
     G.t += dt;
     const p = G.player;
 
-    const era = Math.min(ERAS.length - 1, Math.floor(G.t / ERA_LEN));
+    const era = Math.min(G.eraCount - 1, Math.floor(G.t / G.eraLen));
     if (era !== G.era) {
       G.era = era;
       showBanner(ERAS[era].name, ERAS[era].sub);
       updateHudEra();
     }
     if (G.t >= GOAL) { endGame(true); return; }
-    if (G.t - era * ERA_LEN >= BOSS_AT && !G.bossSpawned[era]) {
+    if (G.t - era * G.eraLen >= G.eraLen * 0.66 && !G.bossSpawned[era]) {
       G.bossSpawned[era] = true;
       spawnBoss(era);
     }
@@ -1021,7 +1044,7 @@
     hud.xp.style.width = `${clamp(G.xp / G.xpNeed, 0, 1) * 100}%`;
     hud.hp.style.width = `${clamp(p.hp / p.maxHp, 0, 1) * 100}%`;
   }
-  function updateHudEra() { setText(hud.era, 'era', `${ERAS[G.era].name} (${G.era + 1}/${ERAS.length})`); }
+  function updateHudEra() { setText(hud.era, 'era', `${ERAS[G.era].name} (${G.era + 1}/${G.eraCount})`); }
   function iconHtml(id) {
     const u = UPGRADES[id];
     return u.icon ? `<img class="px-icon" src="${Sprites.iconURL(u.icon)}" alt="">` : u.emoji;
@@ -1094,8 +1117,8 @@
 
   function pickQuestion() {
     const all = window.QUESTIONS.map((q, i) => ({ ...q, id: i }));
-    const byGrade = all.filter(q => grade >= 2 || q.lv === 1);
-    const avail = byGrade.filter(q => q.era <= G.era);
+    const byLevel = all.filter(q => level >= 2 || q.lv === 1);
+    const avail = byLevel.filter(q => q.era <= G.era);
     let pool = avail.filter(q => !G.usedQ.has(q.id));
     if (!pool.length) {
       for (const q of avail) G.usedQ.delete(q.id);
@@ -1111,26 +1134,28 @@
     state = 'quiz';
     joy.active = false;
     const q = pickQuestion();
-    const order = shuffle([0, 1, 2, 3]);
+    const ox = q.c.length === 2;
+    const order = ox ? [0, 1] : shuffle(q.c.map((_, i) => i));   // ○× 문제는 순서를 그대로 둔다
     quiz = { q, order, answered: false, correct: false };
     $('quiz-tag').textContent = `레벨 업! Lv ${G.level}`;
-    $('quiz-era').textContent = ERAS[q.era].name;
+    $('quiz-era').textContent = `${ERAS[q.era].name} · ${q.std}`;
+    $('quiz-choices').classList.toggle('ox', ox);
     $('quiz-q').textContent = q.q;
     const box = $('quiz-choices');
     box.innerHTML = '';
     order.forEach((ci, i) => {
       const b = document.createElement('button');
-      b.innerHTML = `<span class="num">${i + 1}</span><span>${escapeHtml(q.c[ci])}</span>`;
+      b.innerHTML = `<span class="num">${i + 1}</span><span class="txt">${escapeHtml(q.c[ci])}</span>`;
       b.addEventListener('click', () => answerQuiz(i));
       box.appendChild(b);
     });
     $('quiz-result').classList.add('hidden');
     showScreen('screen-quiz');
 
-    // 3학년: 제한 시간 15초
+    // 도전: 제한 시간 15초
     const timerEl = $('quiz-timer');
     clearInterval(quizTimerId);
-    if (grade >= 3) {
+    if (level >= 2) {
       let left = 15;
       timerEl.textContent = `⏱ ${left}초`;
       timerEl.classList.remove('hidden');
@@ -1154,6 +1179,9 @@
     G.quizTotal++;
     if (correct) G.quizRight++;
     else G.wrongNote.push(q);
+    const st = G.stdStats[q.std] || (G.stdStats[q.std] = { right: 0, total: 0 });
+    st.total++;
+    if (correct) st.right++;
     const btns = $('quiz-choices').children;
     for (let k = 0; k < btns.length; k++) {
       btns[k].disabled = true;
@@ -1243,7 +1271,7 @@
     joy.active = false;
     $('over-title').textContent = win ? '🏆 생존 성공!' : '💀 쓰러졌습니다';
     $('over-sub').textContent = win
-      ? '선사 시대부터 조선까지 모든 시대를 지켜 냈어요!'
+      ? `${ERAS[0].name}부터 ${ERAS[G.eraCount - 1].name}까지 모든 시대를 지켜 냈어요!`
       : `${ERAS[Math.max(0, G.era)].name}에서 쓰러졌어요. 다시 도전해 보세요!`;
     const rate = G.quizTotal ? Math.round(G.quizRight / G.quizTotal * 100) : 0;
     $('over-stats').innerHTML = `
@@ -1253,10 +1281,16 @@
       <div>처치한 적<b>${G.kills}</b></div>
       <div>쓰러뜨린 보스<b>${G.bossesKilled}</b></div>
       <div>퀴즈 정답률<b>${G.quizRight}/${G.quizTotal} (${rate}%)</b></div>`;
+    const stds = Object.keys(G.stdStats).sort();
+    $('over-std').innerHTML = stds.map(k => {
+      const st = G.stdStats[k], pct = Math.round(st.right / st.total * 100);
+      return `<div class="std-row"><span>[${k}]</span><span class="bar"><i style="width:${pct}%"></i></span><b>${st.right}/${st.total}</b></div>`;
+    }).join('');
+    $('over-std-wrap').classList.toggle('hidden', !stds.length);
     const note = $('over-note');
     if (G.wrongNote.length) {
       note.innerHTML = G.wrongNote.map(q =>
-        `<div><b>[${ERAS[q.era].name}]</b> ${escapeHtml(q.q)}<br><span class="ans">정답: ${escapeHtml(q.c[q.a])}</span> — ${escapeHtml(q.exp)}</div>`).join('');
+        `<div><b>[${ERAS[q.era].name} · ${q.std}]</b> ${escapeHtml(q.q)}<br><span class="ans">정답: ${escapeHtml(q.c[q.a])}</span> — ${escapeHtml(q.exp)}</div>`).join('');
       $('over-note-wrap').classList.remove('hidden');
     } else {
       $('over-note-wrap').classList.add('hidden');
@@ -1265,23 +1299,32 @@
   }
 
   // ── 버튼 연결 ─────────────────────────────────────────
-  const GRADE_DESC = {
-    1: '기본 문제만 출제돼요.',
-    2: '기본 + 심화 문제가 출제돼요.',
-    3: '기본 + 심화 문제, 문제마다 15초 제한 시간이 있어요.',
-  };
-  function setGrade(g) {
-    grade = g;
-    for (const b of $('grade-btns').children) b.classList.toggle('on', +b.dataset.grade === g);
-    $('grade-desc').textContent = GRADE_DESC[g];
+  function syncUrl() {
     const u = new URL(location.href);
     u.searchParams.set('g', 'history-survivor');
     u.searchParams.set('m', 'solo');
-    u.searchParams.set('grade', g);
+    u.searchParams.set('grade', '5');
+    u.searchParams.set('unit', unit);
+    u.searchParams.set('lv', level);
     try { history.replaceState(null, '', u); } catch (e) { /* file:// 등에서는 무시 */ }
   }
-  for (const b of $('grade-btns').children) b.addEventListener('click', () => setGrade(+b.dataset.grade));
-  setGrade(grade);
+  function setUnit(v) {
+    unit = v;
+    for (const b of $('unit-btns').children) b.classList.toggle('on', +b.dataset.unit === v);
+    const eras = ERAS.filter(e => e.unit <= v);
+    $('unit-desc').textContent = `${UNITS[v].desc}\n${eras.map(e => e.name).join(' → ')}`;
+    syncUrl();
+  }
+  function setLevel(v) {
+    level = v;
+    for (const b of $('level-btns').children) b.classList.toggle('on', +b.dataset.level === v);
+    $('level-desc').textContent = v === 1 ? '교과서 핵심 문제만 나와요.' : '더 깊은 문제까지 나오고, 문제마다 15초 제한 시간이 있어요.';
+    syncUrl();
+  }
+  for (const b of $('unit-btns').children) b.addEventListener('click', () => setUnit(+b.dataset.unit));
+  for (const b of $('level-btns').children) b.addEventListener('click', () => setLevel(+b.dataset.level));
+  setUnit(unit);
+  setLevel(level);
 
   // 캐릭터 선택
   const heroList = $('hero-list');

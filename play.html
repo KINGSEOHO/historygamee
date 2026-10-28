@@ -34,16 +34,24 @@
   <div id="screen-title" class="screen">
     <div class="panel title-panel">
       <div class="logo">⚔️ 역사 서바이버</div>
-      <p class="tagline">선사 시대부터 조선까지, 역사 퀴즈를 풀며 끝까지 살아남아라!</p>
+      <p class="tagline">초등 5학년 2학기 사회 · 한국사 단원에 맞춘 역사 퀴즈 서바이벌!</p>
       <div class="row">
-        <span class="label">학년</span>
-        <div id="grade-btns" class="seg">
-          <button data-grade="1">1학년</button>
-          <button data-grade="2">2학년</button>
-          <button data-grade="3">3학년</button>
+        <span class="label">배운 단원</span>
+        <div id="unit-btns" class="seg">
+          <button data-unit="1">1단원</button>
+          <button data-unit="2">1~2단원</button>
+          <button data-unit="3">1~3단원</button>
         </div>
       </div>
-      <p id="grade-desc" class="small"></p>
+      <p id="unit-desc" class="small"></p>
+      <div class="row">
+        <span class="label">난이도</span>
+        <div id="level-btns" class="seg">
+          <button data-level="1">기본</button>
+          <button data-level="2">도전</button>
+        </div>
+      </div>
+      <p id="level-desc" class="small"></p>
       <div class="label hero-label">캐릭터 선택</div>
       <div id="hero-list" class="heroes"></div>
       <div id="hero-info" class="hero-info">
@@ -58,7 +66,7 @@
         <li><b>이동</b> — WASD / 방향키, 모바일은 화면을 드래그</li>
         <li><b>공격</b> — 무기가 자동으로 공격해요</li>
         <li><b>레벨 업</b> — 역사 퀴즈를 맞히면 강화 3개 중 선택, 틀리면 1개만!</li>
-        <li><b>목표</b> — 6개 시대를 지나 <b>6분</b> 동안 살아남기</li>
+        <li><b>목표</b> — 배운 단원의 시대들을 지나 <b>6분</b> 동안 살아남기</li>
       </ul>
       <button id="btn-start" class="primary">게임 시작 (Enter)</button>
       <div class="small mode">모드: 솔로</div>
@@ -107,6 +115,10 @@
       <div id="over-title" class="logo small-logo"></div>
       <div id="over-sub" class="tagline"></div>
       <div id="over-stats" class="stats"></div>
+      <div id="over-std-wrap" class="hidden">
+        <h3>📊 성취기준별 정답</h3>
+        <div id="over-std" class="std-list"></div>
+      </div>
       <div id="over-note-wrap" class="hidden">
         <h3>📒 오답 노트</h3>
         <div id="over-note" class="note"></div>

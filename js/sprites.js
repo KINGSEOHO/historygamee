@@ -177,6 +177,10 @@
 
     // 허리띠
     rr(-10, 7.5 + bob, 20, 3.2, 1.4, o.belt || '#2d2018', 1.3);
+    if (o.straps) {
+      stroke([-6, -1 + bob, 6, 8 + bob], OL, 3 * lwScale);
+      stroke([-6, -1 + bob, 6, 8 + bob], o.straps, 1.8);
+    }
     if (o.beltKnot) ell(-6, 11 + bob, 1.6, 3, o.belt || '#2d2018', 1.1, 0.3);
 
     // 머리
@@ -217,6 +221,7 @@
     const fh = { x: 9.5 + s * 1.6, y: 5 + bob };
     weaponBack(fh, o.weapon, f);
     limb([3, 0 + bob, fh.x, fh.y], robe, 4.6);
+    if (o.armband) limb([4.6, 1.4 + bob, 6.2, 2.6 + bob], o.armband, 4.6);
     weapon(fh, o.weapon, f, o);
     circ(fh.x, fh.y, 2.8, rad(fh.x, fh.y, 2.8, skin), 1.4);
     weaponFront(fh, o.weapon);
@@ -336,6 +341,25 @@
       }
       case 'hood':
         break;
+      case 'kepi': {      // 19세기 서양 군모
+        hairCap(hx, hy, R, hair);
+        poly([hx - 9, hy - 6, hx + 8, hy - 6, hx + 6.5, hy - 19, hx - 9.5, hy - 17], lin(hx - 9, hy - 19, hx + 8, hy - 6, hc), 1.6);
+        rr(hx - 10, hy - 9, 19, 3.4, 1, o.band || '#2f4f9a', 1.2);
+        poly([hx + 4, hy - 6.5, hx + 13, hy - 5, hx + 12, hy - 3.5, hx + 3, hy - 4.5], '#2a2420', 1.2);   // 챙
+        break;
+      }
+      case 'cap': {       // 챙 달린 군모
+        hairCap(hx, hy, R, hair);
+        g.beginPath();
+        g.moveTo(hx - 11, hy - 6);
+        g.quadraticCurveTo(hx - 12, hy - 16, hx, hy - 16.5);
+        g.quadraticCurveTo(hx + 12, hy - 16, hx + 11, hy - 7);
+        g.closePath();
+        fs(lin(hx, hy - 17, hx, hy - 6, hc), 1.6);
+        rr(hx - 11.5, hy - 8.5, 22, 3.2, 1.2, o.band || shade(hc, -0.35), 1.2);
+        poly([hx + 5, hy - 6.5, hx + 14, hy - 5, hx + 13, hy - 3.2, hx + 4, hy - 4.6], '#2a2420', 1.2);
+        break;
+      }
       case 'fur': {
         g.beginPath();
         g.arc(hx, hy - 4, R + 0.5, Math.PI * 1.02, Math.PI * 1.98);
@@ -446,6 +470,13 @@
         rr(0, -1.5, 22, 3, 1, lin(0, -1.5, 0, 1.5, '#4a4a52', 0.3, -0.3), 1.2);
         rr(19, -2, 3, 4, 1, '#2a2a30', 1);
         stroke([2, 2, 2, 4.5], '#c8302a', 1.2);
+        break;
+      }
+      case 'rifle': {
+        g.rotate(-0.95);
+        rr(-12, -2, 13, 4.4, 2, lin(0, -2, 0, 2, '#7a5230'), 1.2);
+        rr(0, -1.3, 20, 2.6, 1, lin(0, -1.3, 0, 1.3, '#4a4a52', 0.3, -0.3), 1.1);
+        poly([20, -0.8, 27, 0, 20, 0.8], '#d5dde6', 0.9);
         break;
       }
       case 'handaxe': {
@@ -807,6 +838,14 @@
       const fw = Math.sin(f * TAU * 2) * 1.2;
       poly([mx, -33, mx - 9, -31 + fw, mx, -28], o.flag || '#c8302a', 1.1);
     }
+    if (o.steam) {
+      rr(-4, -26, 8, 26, 1.5, lin(-4, 0, 4, 0, '#2a2a30', 0.3, -0.2), 1.5);
+      rr(-4.5, -22, 9, 3, 1, '#b8322a', 1.1);
+      for (let i = 0; i < 3; i++) {
+        const t = (f + i / 3) % 1;
+        circ(-2 - t * 10, -30 - t * 10, 3 + t * 4, `rgba(200,200,200,${0.8 - t * 0.6})`, 0);
+      }
+    }
     // 선체
     g.beginPath();
     g.moveTo(-28, 1);
@@ -1130,6 +1169,17 @@
     gogok_b: { draw: f => gogok(f, '#4aa8ff'), still: true },
     gogok_g: { draw: f => gogok(f, '#3fc46e'), still: true },
     gogok_r: { draw: f => gogok(f, '#ef4f4f'), still: true },
+
+    // 조선 후기·개항기 (병인양요·신미양요)
+    french_soldier: H({ robe: '#2f4f9a', pants: '#b8322a', shoe: '#2a2420', hat: 'kepi', hatColor: '#b8322a', band: '#2f4f9a', weapon: 'rifle', mustache: true, angry: true, belt: '#e8e0d0', straps: '#e8e0d0', trim: '#2f4f9a' }),
+    us_marine: H({ robe: '#26304a', pants: '#7f96b8', shoe: '#2a2420', hat: 'kepi', hatColor: '#26304a', band: '#26304a', weapon: 'rifle', beard: true, hair: '#6a4a2a', angry: true, belt: '#e8e0d0', straps: '#e8e0d0', trim: '#26304a' }),
+    west_boat: { draw: f => ship(f, { sail: '#ecebe4', hull: '#3a3a42', flag: '#2f4f9a' }), shadowY: 17, mul: 0.95 },
+    steamship: { draw: f => ship(f, { sail: '#d8d8d0', hull: '#25252c', flag: '#e8e8e8', masts: [-15, 15], steam: true }), shadowY: 17, mul: 0.95 },
+    // 일제 강점기
+    jp_soldier: H({ robe: '#86804e', pants: '#76703e', shoe: '#2a2420', hat: 'cap', hatColor: '#7a7444', weapon: 'rifle', angry: true, belt: '#3a2a1a', straps: '#5a4a2a', trim: '#86804e' }),
+    jp_mp: H({ robe: '#76703e', pants: '#2a2a2a', shoe: '#1a1a1a', hat: 'cap', hatColor: '#6a6436', band: '#8a2a24', armband: '#f0ece0', weapon: 'saber', mustache: true, angry: true, belt: '#2a1a12', trim: '#76703e' }),
+    jp_rider: { draw: f => rider(f, { robe: '#86804e', hat: 'cap', hatColor: '#7a7444', weapon: 'saber', angry: true, pants: '#76703e', trim: '#86804e', horse: { color: '#6a4a2a', saddle: '#4a3a22', angry: true } }) },
+    jp_officer: H({ robe: '#6f683a', pants: '#5f5a32', shoe: '#1a1a1a', hat: 'cap', hatColor: '#5f5a32', band: '#8a2a24', weapon: 'saber', mustache: true, angry: true, cape: '#3a3a2a', belt: '#2a1a12', straps: '#3a2a1a', trim: '#6f683a' }),
 
     // 무기/아이템
     chongtong: { draw: chongtong, still: true },

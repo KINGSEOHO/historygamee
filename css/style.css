@@ -239,3 +239,24 @@ button.primary:hover { background: #c95539; }
 .px-icon { width: 1.15em; height: 1.15em; vertical-align: -0.2em; object-fit: contain; }
 .card .emoji .px-icon { width: 52px; height: 52px; }
 .inv-item .px-icon { width: 24px; height: 24px; }
+
+/* ○× 문제 */
+.choices.ox button { justify-content: center; font-size: 30px; font-weight: 900; padding: 16px; }
+.choices.ox button .num { font-size: 13px; }
+.choices.ox button:first-child .txt { color: #2a63c9; }
+.choices.ox button:last-child .txt { color: #c0392b; }
+@media (max-width: 420px) { .choices.ox { grid-template-columns: 1fr 1fr; } }
+
+/* 성취기준별 정답률 */
+.std-list { text-align: left; margin-bottom: 14px; }
+.std-row { display: grid; grid-template-columns: 92px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; margin: 4px 0; }
+.std-row .bar { height: 10px; background: #eadfc6; border-radius: 99px; overflow: hidden; }
+.std-row .bar i { display: block; height: 100%; background: var(--good); }
+.std-row b { text-align: right; }
+
+#unit-desc { white-space: pre-line; line-height: 1.6; }
+.label, .seg button { white-space: nowrap; }
+@media (max-width: 420px) {
+  .row { gap: 6px; }
+  .seg button { padding: 8px 10px; font-size: 14px; }
+}
