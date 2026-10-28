@@ -44,6 +44,16 @@
         </div>
       </div>
       <p id="grade-desc" class="small"></p>
+      <div class="label hero-label">캐릭터 선택</div>
+      <div id="hero-list" class="heroes"></div>
+      <div id="hero-info" class="hero-info">
+        <canvas id="hero-portrait" class="portrait"></canvas>
+        <div class="hero-text">
+          <div class="hero-name"><b id="hero-name"></b> <span id="hero-title"></span></div>
+          <div id="hero-desc" class="hero-desc"></div>
+          <div class="hero-tags"><span id="hero-weapon" class="tag era"></span><span id="hero-perk" class="tag"></span></div>
+        </div>
+      </div>
       <ul class="howto">
         <li><b>이동</b> — WASD / 방향키, 모바일은 화면을 드래그</li>
         <li><b>공격</b> — 무기가 자동으로 공격해요</li>
@@ -109,6 +119,7 @@
   </div>
 
   <script src="js/questions.js"></script>
+  <script src="js/sprites.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

@@ -123,59 +123,76 @@
     {
       name: '선사 시대', sub: '구석기 · 신석기 · 청동기', bg: '#34432a', line: 'rgba(0,0,0,.10)', deco: ['🌿', '🪨', '🌲'],
       enemies: [
-        { name: '들쥐', emoji: '🐀', hp: 7, speed: 92, dmg: 5, xp: 1, r: 12, w: 4 },
-        { name: '멧돼지', emoji: '🐗', hp: 16, speed: 68, dmg: 8, xp: 2, r: 16, w: 2 },
-        { name: '늑대', emoji: '🐺', hp: 12, speed: 108, dmg: 7, xp: 2, r: 15, w: 1 },
+        { name: '들쥐', sprite: 'rat', hp: 7, speed: 92, dmg: 5, xp: 1, r: 12, w: 4 },
+        { name: '멧돼지', sprite: 'boar', hp: 16, speed: 68, dmg: 8, xp: 2, r: 16, w: 2 },
+        { name: '늑대', sprite: 'wolf', hp: 12, speed: 108, dmg: 7, xp: 2, r: 15, w: 1 },
       ],
-      boss: { name: '거대 매머드', emoji: '🦣', hp: 420, speed: 52, dmg: 12, xp: 25, r: 46 },
+      boss: { name: '거대 매머드', sprite: 'mammoth', hp: 420, speed: 52, dmg: 12, xp: 25, r: 46 },
     },
     {
       name: '고조선', sub: '단군왕검 · 8조법 · 비파형 동검', bg: '#3c4630', line: 'rgba(0,0,0,.10)', deco: ['🌾', '🪨', '🌳'],
       enemies: [
-        { name: '독사', emoji: '🐍', hp: 10, speed: 96, dmg: 6, xp: 1, r: 13, w: 3 },
-        { name: '호랑이', emoji: '🐅', hp: 20, speed: 100, dmg: 9, xp: 2, r: 18, w: 2 },
-        { name: '한나라 병사', emoji: '💂', hp: 26, speed: 70, dmg: 9, xp: 3, r: 16, w: 2 },
+        { name: '독사', sprite: 'snake', hp: 10, speed: 96, dmg: 6, xp: 1, r: 13, w: 3 },
+        { name: '호랑이', sprite: 'tiger', hp: 20, speed: 100, dmg: 9, xp: 2, r: 18, w: 2 },
+        { name: '한나라 병사', sprite: 'han_soldier', hp: 26, speed: 70, dmg: 9, xp: 3, r: 16, w: 2 },
       ],
-      boss: { name: '한나라 장수', emoji: '🤺', hp: 900, speed: 60, dmg: 22, xp: 35, r: 42 },
+      boss: { name: '한나라 장수', sprite: 'han_general', hp: 900, speed: 60, dmg: 22, xp: 35, r: 42 },
     },
     {
       name: '삼국 시대', sub: '고구려 · 백제 · 신라 · 가야', bg: '#45402c', line: 'rgba(0,0,0,.10)', deco: ['🌲', '⛰️', '🌾'],
       enemies: [
-        { name: '수나라 척후병', emoji: '🥷', hp: 18, speed: 112, dmg: 9, xp: 2, r: 14, w: 3 },
-        { name: '수나라 보병', emoji: '💂', hp: 34, speed: 72, dmg: 11, xp: 3, r: 16, w: 3 },
-        { name: '당나라 기병', emoji: '🏇', hp: 30, speed: 125, dmg: 12, xp: 3, r: 18, w: 2 },
+        { name: '수나라 척후병', sprite: 'sui_scout', hp: 18, speed: 112, dmg: 9, xp: 2, r: 14, w: 3 },
+        { name: '수나라 보병', sprite: 'sui_infantry', hp: 34, speed: 72, dmg: 11, xp: 3, r: 16, w: 3 },
+        { name: '당나라 기병', sprite: 'tang_rider', hp: 30, speed: 125, dmg: 12, xp: 3, r: 18, w: 2 },
       ],
-      boss: { name: '당 태종의 친위대장', emoji: '🤴', hp: 1700, speed: 64, dmg: 26, xp: 45, r: 44 },
+      boss: { name: '당 태종의 친위대장', sprite: 'tang_guard', hp: 1700, speed: 64, dmg: 26, xp: 45, r: 44 },
     },
     {
       name: '남북국 시대', sub: '통일 신라 · 발해', bg: '#2f4747', line: 'rgba(0,0,0,.12)', deco: ['🪷', '🌳', '🌊'],
       enemies: [
-        { name: '해적 선원', emoji: '🏴‍☠️', hp: 30, speed: 98, dmg: 11, xp: 2, r: 15, w: 3 },
-        { name: '상어', emoji: '🦈', hp: 40, speed: 120, dmg: 13, xp: 3, r: 19, w: 2 },
-        { name: '거대 문어', emoji: '🐙', hp: 60, speed: 66, dmg: 14, xp: 4, r: 20, w: 2 },
+        { name: '해적 선원', sprite: 'pirate', hp: 30, speed: 98, dmg: 11, xp: 2, r: 15, w: 3 },
+        { name: '상어', sprite: 'shark', hp: 40, speed: 120, dmg: 13, xp: 3, r: 19, w: 2 },
+        { name: '거대 문어', sprite: 'octopus', hp: 60, speed: 66, dmg: 14, xp: 4, r: 20, w: 2 },
       ],
-      boss: { name: '해적 대선단', emoji: '🚢', hp: 2800, speed: 58, dmg: 30, xp: 55, r: 50 },
+      boss: { name: '해적 대선단', sprite: 'pirate_ship', hp: 2800, speed: 58, dmg: 30, xp: 55, r: 50 },
     },
     {
       name: '고려', sub: '거란 · 여진 · 몽골의 침입', bg: '#4a3a2c', line: 'rgba(0,0,0,.12)', deco: ['🍂', '🌳', '🪨'],
       enemies: [
-        { name: '거란 기병', emoji: '🏇', hp: 44, speed: 122, dmg: 14, xp: 3, r: 18, w: 3 },
-        { name: '몽골 군마', emoji: '🐎', hp: 54, speed: 135, dmg: 15, xp: 3, r: 19, w: 2 },
-        { name: '몽골 사냥매', emoji: '🦅', hp: 32, speed: 150, dmg: 12, xp: 3, r: 15, w: 2 },
+        { name: '거란 기병', sprite: 'khitan_rider', hp: 44, speed: 122, dmg: 14, xp: 3, r: 18, w: 3 },
+        { name: '몽골 군마', sprite: 'mongol_horse', hp: 54, speed: 135, dmg: 15, xp: 3, r: 19, w: 2 },
+        { name: '몽골 사냥매', sprite: 'eagle', hp: 32, speed: 150, dmg: 12, xp: 3, r: 15, w: 2 },
       ],
-      boss: { name: '몽골 침략군 대장', emoji: '🐲', hp: 4200, speed: 62, dmg: 34, xp: 70, r: 52 },
+      boss: { name: '몽골 침략군 대장', sprite: 'mongol_chief', hp: 4200, speed: 62, dmg: 34, xp: 70, r: 52 },
     },
     {
       name: '조선', sub: '훈민정음 · 임진왜란 · 수원 화성', bg: '#3b3a4a', line: 'rgba(0,0,0,.12)', deco: ['🌸', '🌳', '🪨'],
       enemies: [
-        { name: '왜군 척후병', emoji: '🥷', hp: 56, speed: 130, dmg: 15, xp: 3, r: 15, w: 3 },
-        { name: '왜군 조총병', emoji: '💂', hp: 76, speed: 82, dmg: 17, xp: 4, r: 17, w: 3 },
-        { name: '왜선', emoji: '⛵', hp: 110, speed: 70, dmg: 20, xp: 5, r: 22, w: 1 },
+        { name: '왜군 척후병', sprite: 'wae_scout', hp: 56, speed: 130, dmg: 15, xp: 3, r: 15, w: 3 },
+        { name: '왜군 조총병', sprite: 'wae_gunner', hp: 76, speed: 82, dmg: 17, xp: 4, r: 17, w: 3 },
+        { name: '왜선', sprite: 'wae_ship', hp: 110, speed: 70, dmg: 20, xp: 5, r: 22, w: 1 },
       ],
-      boss: { name: '왜군 대함대', emoji: '🏯', hp: 6500, speed: 55, dmg: 40, xp: 90, r: 56 },
+      boss: { name: '왜군 대함대', sprite: 'wae_fleet', hp: 6500, speed: 55, dmg: 40, xp: 90, r: 56 },
     },
   ];
   const GOAL = ERA_LEN * ERAS.length;
+
+  // ── 영웅 ──────────────────────────────────────────────
+  const HEROES = [
+    { id: 'dol', name: '돌이', title: '구석기 소년', start: 'axe', perk: '이동 속도 +15%', mods: { speed: 0.15 },
+      desc: '돌을 깨뜨려 만든 주먹도끼를 던지며 날쌔게 달려요.' },
+    { id: 'jumong', name: '주몽', title: '고구려를 세운 왕', start: 'arrow', perk: '화살 +1', mods: { extraArrow: 1 },
+      desc: '활을 매우 잘 쏘아 ‘주몽’이라는 이름을 얻었다고 해요.' },
+    { id: 'yusin', name: '김유신', title: '신라의 화랑 · 장군', start: 'sword', perk: '최대 체력 +30, 받는 피해 -1', mods: { hp: 30, armor: 1 },
+      desc: '화랑 출신 장군으로, 신라의 삼국 통일에 앞장섰어요.' },
+    { id: 'sejong', name: '세종대왕', title: '조선 제4대 왕', start: 'bell', perk: '경험치 +20%', mods: { xp: 0.2 },
+      desc: '훈민정음을 만들고, 박연과 함께 궁중 음악을 정리했어요.' },
+    { id: 'sunsin', name: '이순신', title: '조선 수군의 장수', start: 'rocket', perk: '공격력 +15%', mods: { dmg: 0.15 },
+      desc: '임진왜란 때 거북선과 함께 바다를 지켜 낸 장수예요.' },
+  ];
+  const heroById = id => HEROES.find(h => h.id === id) || HEROES[0];
+  let heroId = 'jumong';
+  try { heroId = heroById(localStorage.getItem('hs-hero') || heroId).id; } catch (e) { /* 저장소를 쓸 수 없으면 기본값 */ }
 
   // ── 강화(무기/유물) 정의 ─────────────────────────────
   const MAX_LV = 5;
@@ -208,7 +225,7 @@
       type: 'w', name: '성덕대왕신종', emoji: '🔔',
       tip: '에밀레종이라고도 불리는 통일 신라의 범종이에요.',
       desc: ['종소리 파동이 주변 적 모두에게 피해를 줍니다.', '범위 증가', '피해량 증가', '울리는 간격 감소', '범위·피해량 대폭 증가'],
-      stat: lv => ({ r: 80 + 14 * lv + (lv >= 5 ? 20 : 0), tick: lv >= 4 ? 0.85 : 1.1, dmg: 8 + 4 * lv + (lv >= 5 ? 6 : 0) }),
+      stat: lv => ({ r: 96 + 14 * lv + (lv >= 5 ? 20 : 0), tick: lv >= 4 ? 0.8 : 1.0, dmg: 10 + 4 * lv + (lv >= 5 ? 6 : 0) }),
     },
     rocket: {
       type: 'w', name: '신기전', emoji: '🚀',
@@ -238,9 +255,10 @@
       t: 0, era: -1, kills: 0, level: 1, xp: 0, xpNeed: xpFor(1), pendingLv: 0, pendingChest: 0,
       player: {
         x: 0, y: 0, r: 15, hp: 100, maxHp: 100, baseSpeed: 165, speed: 165, armor: 0, magnet: 70,
-        regen: 0, dmgMul: 1, cdMul: 1, xpMul: 1, inv: 0, fx: 1, fy: 0, face: 1, walk: 0,
+        regen: 0, dmgMul: 1, cdMul: 1, xpMul: 1, inv: 0, fx: 1, fy: 0, face: 1, anim: 0,
       },
-      weapons: { arrow: 1 }, passives: {}, timers: {},
+      hero: heroById(heroId),
+      weapons: { [heroById(heroId).start]: 1 }, passives: {}, timers: {},
       enemies: [], projs: [], gems: [], items: [], fx: [], texts: [],
       spawnT: 1, waveT: 25, bossSpawned: {}, mirrorAng: 0,
       quizRight: 0, quizTotal: 0, wrongNote: [], usedQ: new Set(),
@@ -254,13 +272,14 @@
   function recomputeStats() {
     const p = G.player;
     const oldMax = p.maxHp;
-    p.speed = p.baseSpeed * (1 + 0.1 * (G.passives.shoes || 0));
-    p.armor = G.passives.armor || 0;
+    const m = G.hero.mods;
+    p.speed = p.baseSpeed * (1 + 0.1 * (G.passives.shoes || 0) + (m.speed || 0));
+    p.armor = (G.passives.armor || 0) + (m.armor || 0);
     p.magnet = 70 * (1 + 0.35 * (G.passives.jige || 0));
-    p.xpMul = 1 + 0.1 * (G.passives.book || 0);
-    p.maxHp = 100 + 20 * (G.passives.ginseng || 0);
+    p.xpMul = 1 + 0.1 * (G.passives.book || 0) + (m.xp || 0);
+    p.maxHp = 100 + 20 * (G.passives.ginseng || 0) + (m.hp || 0);
     p.regen = 0.5 * (G.passives.ginseng || 0);
-    p.dmgMul = 1 + 0.12 * (G.passives.powder || 0);
+    p.dmgMul = 1 + 0.12 * (G.passives.powder || 0) + (m.dmg || 0);
     p.cdMul = 1 - 0.08 * (G.passives.sundial || 0);
     if (p.maxHp > oldMax) p.hp += p.maxHp - oldMax;
     p.hp = Math.min(p.hp, p.maxHp);
@@ -331,7 +350,7 @@
   function makeEnemy(type, x, y, boss = false) {
     const hpMul = boss ? 1 + G.t / 900 : 1 + G.t / 260;
     return {
-      id: ++eid, x, y, r: type.r, name: type.name, emoji: type.emoji, boss,
+      id: ++eid, x, y, r: type.r, name: type.name, sprite: type.sprite, boss, anim: Math.random(), face: 1,
       hp: type.hp * hpMul, maxHp: type.hp * hpMul,
       speed: type.speed * (boss ? 1 : rand(0.88, 1.12)),
       dmg: type.dmg, xp: type.xp,
@@ -427,8 +446,9 @@
       const p = G.player;
       const t = nearestEnemy(p.x, p.y, 560);
       const ang = t ? Math.atan2(t.y - p.y, t.x - p.x) : Math.atan2(p.fy, p.fx);
-      for (let i = 0; i < s.n; i++) {
-        const a = ang + (i - (s.n - 1) / 2) * 0.14;
+      const n = s.n + (G.hero.mods.extraArrow || 0);
+      for (let i = 0; i < n; i++) {
+        const a = ang + (i - (n - 1) / 2) * 0.14;
         G.projs.push({ k: 'arrow', x: p.x, y: p.y, vx: Math.cos(a) * s.spd, vy: Math.sin(a) * s.spd,
           dmg: s.dmg, pierce: s.pierce, life: 1.3, r: 8, hit: new Set() });
       }
@@ -443,7 +463,10 @@
     },
     sword(s) {
       const p = G.player;
-      const dirs = s.both ? [p.face, -p.face] : [p.face];
+      // 가까운 적이 있는 쪽을 먼저 벤다
+      const t = nearestEnemy(p.x, p.y, s.w + 80);
+      const main = t ? (t.x >= p.x ? 1 : -1) : p.face;
+      const dirs = s.both ? [main, -main] : [main];
       for (const dir of dirs) {
         const x0 = dir > 0 ? p.x : p.x - s.w, x1 = dir > 0 ? p.x + s.w : p.x;
         const y0 = p.y - s.h / 2, y1 = p.y + s.h / 2;
@@ -581,12 +604,13 @@
     for (const e of G.enemies) {
       if (e.hp <= 0) continue;
       e.flash -= dt; e.mirrorCd -= dt;
+      e.anim += dt * (Sprites.info(e.sprite).fly ? 3 : e.speed / 45);
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
       e.x += (dx / d * e.speed + e.kx) * dt;
       e.y += (dy / d * e.speed + e.ky) * dt;
       const decay = Math.min(1, dt * 9);
       e.kx -= e.kx * decay; e.ky -= e.ky * decay;
-      e.face = dx > 0 ? 1 : -1;
+      if (Math.abs(dx) > 4) e.face = dx > 0 ? 1 : -1;
       if (d < e.r + p.r * 0.8 && p.inv <= 0) {
         const dmg = Math.max(1, Math.round(e.dmg - p.armor));
         p.hp -= dmg;
@@ -661,7 +685,7 @@
       const m = Math.hypot(mx, my);
       p.fx = mx / m; p.fy = my / m;
       if (Math.abs(mx) > 0.15) p.face = Math.sign(mx);
-      p.walk += dt * 10;
+      p.anim += dt * 2.2;
     }
     p.inv -= dt;
     if (p.regen) p.hp = Math.min(p.maxHp, p.hp + p.regen * dt);
@@ -762,26 +786,65 @@
 
     // 아이템
     const bob = Math.sin(G.t * 4) * 3;
-    for (const it of G.items) drawEmoji(it.emoji, it.x, it.y + bob, it.kind === 'chest' ? 34 : 24);
+    for (const it of G.items) {
+      if (it.kind === 'chest') {
+        ctx.fillStyle = 'rgba(0,0,0,.25)';
+        ctx.beginPath(); ctx.ellipse(it.x, it.y + 14, 15, 4, 0, 0, Math.PI * 2); ctx.fill();
+        Sprites.draw(ctx, 'chest', it.x, it.y + bob * 0.5, 1.05, G.t * 0.8);
+      } else drawEmoji(it.emoji, it.x, it.y + bob, 24);
+    }
 
-    // 적
+    // 적과 플레이어 — 그림자를 먼저 깔고, 아래쪽에 있는 캐릭터가 앞에 오도록 y 순서로 그린다
+    const visible = [];
     for (const e of G.enemies) {
-      if (Math.abs(e.x - p.x) > VW / 2 + 80 || Math.abs(e.y - p.y) > VH / 2 + 80) continue;
-      ctx.fillStyle = 'rgba(0,0,0,.25)';
-      ctx.beginPath(); ctx.ellipse(e.x, e.y + e.r * 0.8, e.r * 0.8, e.r * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+      if (Math.abs(e.x - p.x) > VW / 2 + 120 || Math.abs(e.y - p.y) > VH / 2 + 120) continue;
+      const info = Sprites.info(e.sprite);
+      const sc = e.r / 16 * (info.mul || 0.82);
+      const sy = e.y + (info.shadowY || 22) * sc;
       if (e.boss) {
-        ctx.strokeStyle = 'rgba(255,80,60,.8)'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI * 2); ctx.stroke();
+        const glow = ctx.createRadialGradient(e.x, sy, 0, e.x, sy, e.r * 1.3);
+        glow.addColorStop(0, 'rgba(255,70,50,.45)');
+        glow.addColorStop(1, 'rgba(255,70,50,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.ellipse(e.x, sy, e.r * 1.3, e.r * 0.5, 0, 0, Math.PI * 2); ctx.fill();
       }
-      drawEmoji(e.emoji, e.x, e.y, e.r * 2, e.face > 0);
-      if (e.flash > 0) {
-        ctx.fillStyle = 'rgba(255,255,255,.55)';
-        ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill();
+      if (!info.fly) {
+        ctx.fillStyle = 'rgba(0,0,0,.28)';
+        ctx.beginPath(); ctx.ellipse(e.x, sy, 14 * sc, 4.5 * sc, 0, 0, Math.PI * 2); ctx.fill();
+      } else {
+        ctx.fillStyle = 'rgba(0,0,0,.15)';
+        ctx.beginPath(); ctx.ellipse(e.x, e.y + 30 * sc, 9 * sc, 3 * sc, 0, 0, Math.PI * 2); ctx.fill();
       }
+      visible.push({ y: sy, e, sc });
+    }
+    const PSC = 1.05;
+    ctx.fillStyle = 'rgba(0,0,0,.3)';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 22 * PSC, 13, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+    visible.push({ y: p.y + 22 * PSC, player: true });
+    visible.sort((a, b) => a.y - b.y);
+
+    for (const v of visible) {
+      if (v.player) {
+        if (p.inv <= 0 || Math.floor(p.inv * 20) % 2 === 0) {
+          Sprites.draw(ctx, G.hero.id, p.x, p.y, PSC, p.anim, p.face < 0);
+        }
+        const hpw = 36;
+        ctx.fillStyle = '#000'; ctx.fillRect(p.x - hpw / 2, p.y + 26, hpw, 5);
+        ctx.fillStyle = '#e8473a'; ctx.fillRect(p.x - hpw / 2, p.y + 26, hpw * p.hp / p.maxHp, 5);
+        continue;
+      }
+      const e = v.e;
+      Sprites.draw(ctx, e.sprite, e.x, e.y, v.sc, e.anim, e.face < 0, e.flash > 0);
       if (e.boss) {
-        const w = e.r * 2;
-        ctx.fillStyle = '#000'; ctx.fillRect(e.x - w / 2, e.y - e.r - 14, w, 6);
-        ctx.fillStyle = '#ff4b3a'; ctx.fillRect(e.x - w / 2, e.y - e.r - 14, w * Math.max(0, e.hp / e.maxHp), 6);
+        const w = e.r * 2, top = e.y - 40 * v.sc;
+        ctx.fillStyle = '#000'; ctx.fillRect(e.x - w / 2 - 1, top - 1, w + 2, 8);
+        ctx.fillStyle = '#ff4b3a'; ctx.fillRect(e.x - w / 2, top, w * Math.max(0, e.hp / e.maxHp), 6);
+        ctx.font = 'bold 12px "Noto Sans KR", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.8)';
+        ctx.strokeText(e.name, e.x, top - 5);
+        ctx.fillStyle = '#ffd9d0';
+        ctx.fillText(e.name, e.x, top - 5);
       }
     }
 
@@ -798,7 +861,7 @@
         ctx.fillRect(-15, -3, 4, 6);
         ctx.restore();
       } else if (pr.k === 'axe') {
-        drawEmoji('🪓', pr.x, pr.y, pr.size, false, pr.rot);
+        Sprites.draw(ctx, 'handaxe', pr.x, pr.y, pr.size / 24, 0, false, false, pr.rot);
       } else if (pr.k === 'rocket') {
         const a = Math.atan2(pr.vy, pr.vx);
         ctx.save(); ctx.translate(pr.x, pr.y); ctx.rotate(a);
@@ -818,20 +881,9 @@
         const mx = p.x + Math.cos(a) * s.rad, my = p.y + Math.sin(a) * s.rad;
         ctx.fillStyle = 'rgba(120, 200, 190, .25)';
         ctx.beginPath(); ctx.arc(mx, my, 16, 0, Math.PI * 2); ctx.fill();
-        drawEmoji('🪞', mx, my, 24);
+        Sprites.draw(ctx, 'mirror', mx, my, 1.15, G.t * 0.6 + i / s.n);
       }
     }
-
-    // 플레이어
-    ctx.fillStyle = 'rgba(0,0,0,.3)';
-    ctx.beginPath(); ctx.ellipse(p.x, p.y + 15, 13, 5, 0, 0, Math.PI * 2); ctx.fill();
-    if (p.inv <= 0 || Math.floor(p.inv * 20) % 2 === 0) {
-      const bobY = Math.abs(Math.sin(p.walk)) * -3;
-      drawEmoji('🧒', p.x, p.y + bobY, 32, p.face > 0);
-    }
-    const hpw = 36;
-    ctx.fillStyle = '#000'; ctx.fillRect(p.x - hpw / 2, p.y + 21, hpw, 5);
-    ctx.fillStyle = '#e8473a'; ctx.fillRect(p.x - hpw / 2, p.y + 21, hpw * p.hp / p.maxHp, 5);
 
     // 효과
     for (const f of G.fx) {
@@ -1140,9 +1192,11 @@
       : `${ERAS[Math.max(0, G.era)].name}에서 쓰러졌어요. 다시 도전해 보세요!`;
     const rate = G.quizTotal ? Math.round(G.quizRight / G.quizTotal * 100) : 0;
     $('over-stats').innerHTML = `
+      <div>캐릭터<b>${G.hero.name}</b></div>
       <div>생존 시간<b>${fmtTime(G.t)}</b></div>
       <div>도달 레벨<b>Lv ${G.level}</b></div>
       <div>처치한 적<b>${G.kills}</b></div>
+      <div>쓰러뜨린 보스<b>${G.bossesKilled}</b></div>
       <div>퀴즈 정답률<b>${G.quizRight}/${G.quizTotal} (${rate}%)</b></div>`;
     const note = $('over-note');
     if (G.wrongNote.length) {
@@ -1174,6 +1228,41 @@
   for (const b of $('grade-btns').children) b.addEventListener('click', () => setGrade(+b.dataset.grade));
   setGrade(grade);
 
+  // 캐릭터 선택
+  const heroList = $('hero-list');
+  for (const h of HEROES) {
+    const b = document.createElement('button');
+    b.className = 'hero-btn';
+    b.dataset.hero = h.id;
+    b.innerHTML = `<canvas></canvas><span>${h.name}</span>`;
+    b.addEventListener('click', () => setHero(h.id));
+    heroList.appendChild(b);
+  }
+  function setHero(id) {
+    const h = heroById(id);
+    heroId = h.id;
+    try { localStorage.setItem('hs-hero', h.id); } catch (e) { /* 무시 */ }
+    for (const b of heroList.children) b.classList.toggle('on', b.dataset.hero === h.id);
+    $('hero-name').textContent = h.name;
+    $('hero-title').textContent = h.title;
+    $('hero-desc').textContent = h.desc;
+    $('hero-weapon').textContent = `시작 무기 ${UPGRADES[h.start].emoji} ${UPGRADES[h.start].name}`;
+    $('hero-perk').textContent = `특성 · ${h.perk}`;
+  }
+  function drawHeroPortraits(t) {
+    for (const b of heroList.children) {
+      const on = b.dataset.hero === heroId;
+      const c = b.firstChild;
+      if (!c.drawn || on || c.wasOn) {
+        Sprites.portrait(c, b.dataset.hero, on ? (t * 1.6) % 1 : 0);
+        c.drawn = true;
+        c.wasOn = on;
+      }
+    }
+    Sprites.portrait($('hero-portrait'), heroId, (t * 1.6) % 1);
+  }
+  setHero(heroId);
+
   $('btn-start').addEventListener('click', startGame);
   $('btn-retry').addEventListener('click', startGame);
   $('btn-home').addEventListener('click', goTitle);
@@ -1185,6 +1274,7 @@
 
   // ── 메인 루프 ─────────────────────────────────────────
   let lastTime = performance.now();
+  let lastPortrait = 0;
   function frame(now) {
     // rAF 타임스탬프가 startGame의 performance.now()보다 이를 수 있으므로 음수 방지
     const dt = clamp((now - lastTime) / 1000, 0, 0.05);
@@ -1192,6 +1282,7 @@
     if (state === 'play') update(dt);
     if (G) { render(); updateHud(); }
     else render();
+    if (state === 'title' && now - lastPortrait > 90) { lastPortrait = now; drawHeroPortraits(now / 1000); }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
