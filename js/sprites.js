@@ -129,6 +129,20 @@
     g.closePath();
     fs(lin(-10, -4, 10, 18, robe), 1.7);
 
+    // 치마 (저고리 아래로 길게)
+    if (o.skirt) {
+      g.beginPath();
+      g.moveTo(-9, 3 + bob);
+      g.lineTo(9, 3 + bob);
+      g.quadraticCurveTo(12, 12 + bob * 0.5, 13.5, 20.5);
+      g.quadraticCurveTo(0, 22.5, -13.5, 20.5);
+      g.quadraticCurveTo(-12, 12 + bob * 0.5, -9, 3 + bob);
+      g.closePath();
+      fs(lin(-13, 3, 13, 21, o.skirt, 0.2, -0.25), 1.7);
+      stroke([-3, 6 + bob, -4.5, 19.5], 'rgba(255,255,255,.12)', 1.2);
+      stroke([4, 6 + bob, 5.5, 19.5], 'rgba(0,0,0,.18)', 1.2);
+    }
+
     // 갑옷 비늘(찰갑)
     if (o.armor) {
       const ac = o.armorColor || '#8b6b3e';
@@ -175,8 +189,11 @@
       g.beginPath(); g.arc(2, 4 + bob, 2.3, 0.3, 4.8); g.stroke();
     }
 
-    // 허리띠
-    rr(-10, 7.5 + bob, 20, 3.2, 1.4, o.belt || '#2d2018', 1.3);
+    // 허리띠 (치마에는 고름)
+    if (o.skirt) {
+      limb([1, 1 + bob, 3.5, 7 + bob], o.goreum || '#c8302a', 1.6);
+      limb([2, 1 + bob, 0.5, 6 + bob], o.goreum || '#c8302a', 1.4);
+    } else rr(-10, 7.5 + bob, 20, 3.2, 1.4, o.belt || '#2d2018', 1.3);
     if (o.straps) {
       stroke([-6, -1 + bob, 6, 8 + bob], OL, 3 * lwScale);
       stroke([-6, -1 + bob, 6, 8 + bob], o.straps, 1.8);
@@ -370,6 +387,23 @@
         for (let i = -10; i <= 9; i += 3.2) stroke([hx + i, hy - 6.5, hx + i + 1, hy - 3.5], shade(o.fur || '#d9c49a', -0.3), 0.7);
         break;
       }
+      case 'gat': {       // 갓
+        hairCap(hx, hy, R, hair);
+        rr(hx - 5.5, hy - 19, 11, 11, 2.5, 'rgba(26,26,32,.92)', 1.5);
+        ell(hx, hy - 8.5, 17, 3.4, 'rgba(26,26,32,.78)', 1.5);
+        stroke([hx - 4, hy - 8, hx - 4, hy - 17], 'rgba(255,255,255,.18)', 1);
+        stroke([hx + 7, hy - 6, hx + 8.5, hy + 4], '#3a2a20', 0.9);              // 갓끈
+        break;
+      }
+      case 'braid': {     // 가운데 가르마에 길게 땋은 머리와 댕기
+        const w = Math.sin(f * TAU) * 1.2;
+        limb([hx - 8, hy + 1, hx - 12, hy + 9 + w, hx - 11, hy + 17 + w], hair, 3.4, true);
+        for (let i = 0; i < 3; i++) stroke([hx - 12.6, hy + 6 + i * 3.4 + w * 0.6, hx - 10.4, hy + 7.4 + i * 3.4 + w * 0.6], 'rgba(255,255,255,.2)', 0.8);
+        poly([hx - 13, hy + 16 + w, hx - 9, hy + 16 + w, hx - 9.5, hy + 22 + w, hx - 12.6, hy + 22 + w], o.band || '#c8302a', 1.1);
+        hairCap(hx, hy, R, hair);
+        stroke([hx + 1, hy - R, hx + 2, hy - 6], 'rgba(255,255,255,.3)', 0.9);       // 가르마
+        break;
+      }
       case 'jingasa': {
         hairCap(hx, hy, R, hair);
         poly([hx - 16, hy - 5, hx + 16, hy - 5, hx + 2, hy - 16, hx - 2, hy - 16], lin(hx - 16, hy - 16, hx + 16, hy - 5, hc), 1.6);
@@ -490,6 +524,25 @@
         limb([-0.5, -20, -3.5, -24, -1, -27], '#8a5a2b', 2.2, true);
         ell(2.2, -23, 2.4, 1.4, '#5fa04a', 1, -0.6);
         ell(-4.4, -21, 2.2, 1.3, '#5fa04a', 1, 0.5);
+        break;
+      }
+      case 'flag': {      // 태극기
+        g.rotate(-0.08);
+        limb([0, 6, 0, -26], '#8a5a2b', 1.8);
+        const wv = Math.sin(f * TAU) * 1.2;
+        g.beginPath();
+        g.moveTo(0.8, -26);
+        g.quadraticCurveTo(8, -27 + wv, 16, -26);
+        g.lineTo(16, -15);
+        g.quadraticCurveTo(8, -16 + wv, 0.8, -15);
+        g.closePath();
+        fs('#fbfbf6', 1.3);
+        g.save();
+        g.beginPath(); g.arc(8.4, -20.5 + wv * 0.4, 3, Math.PI, TAU); g.fillStyle = '#d1303a'; g.fill();
+        g.beginPath(); g.arc(8.4, -20.5 + wv * 0.4, 3, 0, Math.PI); g.fillStyle = '#2a4fa0'; g.fill();
+        g.restore();
+        g.fillStyle = '#222';
+        for (const [x, y] of [[3, -24], [13, -24], [3, -17.5], [13, -17.5]]) g.fillRect(x - 1.2, y + wv * 0.3, 2.4, 1.6);
         break;
       }
       case 'book': {
@@ -1009,7 +1062,41 @@
   }
 
   // ── 강화 아이콘 ──────────────────────────────────────
+  function crane() {
+    limb([-13, 16, -4, -16], '#8a5a2b', 2.8);
+    limb([13, 16, 4, -16], '#8a5a2b', 2.8);
+    limb([-9, 2, 9, 2], '#a8743a', 2.2);
+    rr(-8, -19, 16, 4, 1.5, lin(0, -19, 0, -15, '#9a6a34'), 1.3);
+    circ(0, -13, 3, '#c9a86a', 1.2);
+    stroke([0, -11, 0, 4], '#d9c48a', 1);
+    g.beginPath();
+    g.moveTo(-7, 6); g.quadraticCurveTo(-8, 2, -2, 3); g.quadraticCurveTo(7, 2, 7, 8); g.quadraticCurveTo(5, 13, -3, 12); g.closePath();
+    fs(lin(-8, 2, 7, 13, '#9a958a', 0.25, -0.3), 1.5);
+  }
+  function stone() {
+    g.beginPath();
+    g.moveTo(-11, 2); g.quadraticCurveTo(-12, -8, -3, -9); g.quadraticCurveTo(9, -10, 11, -1); g.quadraticCurveTo(12, 9, 2, 9); g.quadraticCurveTo(-10, 10, -11, 2); g.closePath();
+    fs(lin(-12, -10, 12, 10, '#a39e92', 0.25, -0.3), 1.8);
+    stroke([-6, -5, 2, -7], 'rgba(255,255,255,.4)', 1.2);
+    // 묶은 밧줄
+    stroke([-10, 0, 11, -1], '#c9a86a', 1.6);
+    stroke([0, -9, 0, -16], '#c9a86a', 1.2);
+  }
+  function rifleIcon() {
+    g.save(); g.rotate(-0.5);
+    rr(-20, -2.6, 16, 5.2, 2.2, lin(0, -3, 0, 3, '#7a5230'), 1.3);
+    rr(-5, -1.6, 24, 3.2, 1, lin(0, -1.6, 0, 1.6, '#4a4a52', 0.3, -0.3), 1.2);
+    poly([19, -1, 26, 0, 19, 1], '#d5dde6', 1);
+    g.restore();
+  }
+  function flagIcon(f) {
+    g.save(); g.translate(-6, 12); weapon({ x: 0, y: 0 }, 'flag', 0); g.restore();
+  }
+
   const icons = {
+    crane,
+    rifle: rifleIcon,
+    flag: flagIcon,
     bow() {
       limb([-6, -16, 12, -4, -6, 16], '#8a5a2b', 3, true);
       stroke([-6, -16, -6, 16], '#efe4c8', 1);
@@ -1122,6 +1209,10 @@
     jumong: H({ robe: '#c2412d', dots: '#f3ead2', pants: '#e8d6a8', hat: 'feather', hatColor: '#6b2f22', weapon: 'bow', belt: '#2b1d14', beltKnot: true, trim: '#2b1d14' }),
     yusin: H({ robe: '#2d6e8c', pants: '#e9e0c8', hat: 'topknot', band: '#d8b04a', weapon: 'bipa', belt: '#d8b04a', beltKnot: true, trim: '#f3ecd9' }),
     sejong: H({ robe: '#b8282c', emblem: true, pants: '#7a1a1e', hat: 'royal', beard: true, weapon: 'book', belt: '#e2bb52', trim: '#f3ecd9' }),
+    jeong: H({ robe: '#dfe6ea', trim: '#f6f6f2', pants: '#e8e8e0', shoe: '#3a2a20', hat: 'gat', beard: true, hair: '#3a2a20', weapon: 'book', belt: '#5a7aa0', beltKnot: true }),
+    gwansun: H({ robe: '#f6f4ec', trim: '#ffffff', skirt: '#2a2a32', goreum: '#f6f4ec', shoe: '#2a2a32', hat: 'braid', hair: '#2a1d14', band: '#c8302a', weapon: 'flag' }),
+    junggeun: H({ robe: '#2c2c34', trim: '#f6f4ec', pants: '#2c2c34', shoe: '#1a1a1a', hair: '#2a1d14', mustache: true, weapon: 'rifle', belt: '#2a1a12' }),
+    stone: { draw: stone, still: true },
     sunsin: H({ robe: '#7a2a22', armor: true, armorColor: '#9a6a3a', pants: '#3a2a22', hat: 'helmet', hatColor: '#4a4a55', mustache: true, beard: true, weapon: 'bigsword', cape: '#a82a24', belt: '#2a1a12' }),
 
     // 선사

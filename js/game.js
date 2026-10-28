@@ -214,6 +214,12 @@
       desc: '훈민정음을 만들고, 신기전·측우기 같은 과학 기술을 발전시켰어요.' },
     { id: 'sunsin', name: '이순신', title: '조선 수군의 장수', start: 'gun', perk: '공격력 +15%', mods: { dmg: 0.15 },
       desc: '임진왜란 때 거북선과 함께 바다를 지켜 낸 장수예요.' },
+    { id: 'jeong', name: '정약용', title: '조선 후기의 실학자', start: 'crane', perk: '경험치 +15%, 획득 범위 +30%', mods: { xp: 0.15, magnet: 0.3 },
+      desc: '거중기를 만들어 수원 화성을 쌓는 데 힘을 보탰고, 백성을 위한 책을 많이 썼어요.' },
+    { id: 'gwansun', name: '유관순', title: '3·1 운동의 독립운동가', start: 'shout', perk: '최대 체력 +20, 초당 체력 1 회복', mods: { hp: 20, regen: 1 },
+      desc: '1919년 천안 아우내 장터에서 태극기를 나눠 주며 만세 운동을 이끌었어요.' },
+    { id: 'junggeun', name: '안중근', title: '의병장 · 독립운동가', start: 'rifle', perk: '공격력 +10%, 이동 속도 +10%', mods: { dmg: 0.1, speed: 0.1 },
+      desc: '대한 의군 참모중장으로 싸웠고, 1909년 하얼빈에서 이토 히로부미를 처단했어요.' },
   ];
   const heroById = id => HEROES.find(h => h.id === id) || HEROES[0];
   let heroId = 'dangun';
@@ -264,6 +270,24 @@
       desc: ['가까운 적에게 무거운 탄환을 쏴 여럿을 꿰뚫습니다.', '피해량 증가', '탄환 +1', '관통 +2, 쿨타임 감소', '탄환 +1, 피해량 증가'],
       stat: lv => ({ cd: 1.55 - 0.1 * lv, n: lv >= 5 ? 3 : lv >= 3 ? 2 : 1, dmg: 26 + 9 * lv + (lv >= 5 ? 8 : 0), pierce: lv >= 4 ? 5 : 3, spd: 560 }),
     },
+    crane: {
+      type: 'w', name: '거중기', icon: 'ic_crane',
+      tip: '정약용이 만든 거중기는 도르래로 무거운 돌을 들어 올렸어요.',
+      desc: ['적 머리 위로 큰 돌을 떨어뜨려 주변까지 피해를 줍니다.', '돌 +1', '피해 범위 증가', '돌 +1, 쿨타임 감소', '돌 +1, 피해량 증가'],
+      stat: lv => ({ cd: 2.3 - 0.15 * lv, n: 1 + Math.floor((lv + 1) / 2) + (lv >= 5 ? 1 : 0), dmg: 32 + 11 * lv, ar: 48 + 6 * lv + (lv >= 3 ? 10 : 0) }),
+    },
+    shout: {
+      type: 'w', name: '만세 함성', icon: 'ic_flag',
+      tip: '1919년 3·1 운동 때 사람들은 태극기를 들고 "대한 독립 만세!"를 외쳤어요.',
+      desc: ['퍼져 나가는 함성이 적에게 피해를 주고 멀리 밀어냅니다.', '범위 증가', '피해량 증가', '쿨타임 감소', '함성이 두 겹으로 퍼집니다'],
+      stat: lv => ({ cd: lv >= 4 ? 1.6 : 2.0, maxR: 120 + 20 * lv, dmg: 12 + 6 * lv, kb: 300, waves: lv >= 5 ? 2 : 1 }),
+    },
+    rifle: {
+      type: 'w', name: '의병 소총', icon: 'ic_rifle',
+      tip: '의병은 나라를 지키려고 스스로 일어난 군대예요. 안중근도 의병으로 싸웠어요.',
+      desc: ['화면에서 가장 튼튼한 적(보스 포함)을 노려 강한 한 발을 쏩니다.', '피해량 증가', '관통 +1', '두 발씩 쏩니다', '피해량 대폭 증가'],
+      stat: lv => ({ cd: 1.7 - 0.1 * lv, n: lv >= 4 ? 2 : 1, dmg: 52 + 18 * lv + (lv >= 5 ? 30 : 0), pierce: lv >= 3 ? 2 : 1, spd: 950 }),
+    },
     shoes: { type: 'p', name: '짚신', icon: 'ic_shoes', emoji: '👡', tip: '볏짚으로 엮어 만든 옛 신발이에요.', desc: ['이동 속도 +10%'] },
     armor: { type: 'p', name: '갑옷', icon: 'ic_armor', emoji: '🛡️', tip: '가야는 철로 만든 갑옷으로 유명했어요.', desc: ['받는 피해 -1'] },
     jige: { type: 'p', name: '보부상 지게', icon: 'ic_jige', emoji: '🎒', tip: '보부상은 장터를 돌며 물건을 팔던 상인이에요.', desc: ['경험치 획득 범위 +35%'] },
@@ -290,7 +314,7 @@
       },
       hero: heroById(heroId),
       weapons: { [heroById(heroId).start]: 1 }, passives: {}, timers: {},
-      enemies: [], projs: [], gems: [], items: [], fx: [], texts: [],
+      enemies: [], projs: [], drops: [], waves: [], gems: [], items: [], fx: [], texts: [],
       spawnT: 1, waveT: 25, bossSpawned: {}, mirrorAng: 0,
       quizRight: 0, quizTotal: 0, wrongNote: [], usedQ: new Set(), stdStats: {},
       bossesKilled: 0, shake: 0,
@@ -306,10 +330,10 @@
     const m = G.hero.mods;
     p.speed = p.baseSpeed * (1 + 0.1 * (G.passives.shoes || 0) + (m.speed || 0));
     p.armor = (G.passives.armor || 0) + (m.armor || 0);
-    p.magnet = 70 * (1 + 0.35 * (G.passives.jige || 0));
+    p.magnet = 70 * (1 + 0.35 * (G.passives.jige || 0) + (m.magnet || 0));
     p.xpMul = 1 + 0.1 * (G.passives.book || 0) + (m.xp || 0);
     p.maxHp = 100 + 20 * (G.passives.ginseng || 0) + (m.hp || 0);
-    p.regen = 0.5 * (G.passives.ginseng || 0);
+    p.regen = 0.5 * (G.passives.ginseng || 0) + (m.regen || 0);
     p.dmgMul = 1 + 0.12 * (G.passives.powder || 0) + (m.dmg || 0);
     p.cdMul = 1 - 0.08 * (G.passives.sundial || 0) - (m.cd || 0);
     if (p.maxHp > oldMax) p.hp += p.maxHp - oldMax;
@@ -521,6 +545,38 @@
       G.fx.push({ k: 'smoke', x: p.x + Math.cos(ang) * 18, y: p.y + Math.sin(ang) * 18, life: 0.45, max: 0.45, big: true });
       SFX.boom();
     },
+    crane(s) {
+      const p = G.player;
+      const cands = G.enemies.filter(e => e.hp > 0 && Math.abs(e.x - p.x) < VW / 2 && Math.abs(e.y - p.y) < VH / 2);
+      for (let i = 0; i < s.n; i++) {
+        const t = cands.length ? pick(cands) : null;
+        G.drops.push({ x: t ? t.x : p.x + rand(-200, 200), y: t ? t.y : p.y + rand(-200, 200), t: 0.55, max: 0.55, dmg: s.dmg, ar: s.ar });
+      }
+    },
+    shout(s) {
+      const p = G.player;
+      for (let i = 0; i < s.waves; i++) {
+        G.waves.push({ x: p.x, y: p.y, r: 14 - i * 60, maxR: s.maxR, dmg: s.dmg, kb: s.kb, hit: new Set() });
+      }
+      G.texts.push({ x: p.x, y: p.y - 34, text: '만세!', life: 0.7, color: '#fff3b0' });
+    },
+    rifle(s) {
+      const p = G.player;
+      // 화면 안에서 남은 체력이 가장 많은 적을 노린다
+      let t = null;
+      for (const e of G.enemies) {
+        if (e.hp <= 0 || Math.abs(e.x - p.x) > VW / 2 || Math.abs(e.y - p.y) > VH / 2) continue;
+        if (!t || e.hp > t.hp) t = e;
+      }
+      const ang = t ? Math.atan2(t.y - p.y, t.x - p.x) : Math.atan2(p.fy, p.fx);
+      for (let i = 0; i < s.n; i++) {
+        const a = ang + (i ? 0.06 : 0);
+        G.projs.push({ k: 'bullet', x: p.x, y: p.y, vx: Math.cos(a) * s.spd, vy: Math.sin(a) * s.spd,
+          dmg: s.dmg, pierce: s.pierce, life: 0.9, r: 6, hit: new Set() });
+      }
+      G.fx.push({ k: 'smoke', x: p.x + Math.cos(ang) * 20, y: p.y + Math.sin(ang) * 20, life: 0.35, max: 0.35 });
+      SFX.hit();
+    },
     rocket(s) {
       const p = G.player;
       const cands = G.enemies.filter(e => e.hp > 0 && Math.abs(e.x - p.x) < VW / 2 + 20 && Math.abs(e.y - p.y) < VH / 2 + 20);
@@ -581,6 +637,36 @@
       G.timers[id] = s.cd * p.cdMul;
       FIRE[id](s);
     }
+  }
+
+  function updateAreaAttacks(dt) {
+    for (const d of G.drops) {
+      d.t -= dt;
+      if (d.t > 0) continue;
+      for (const e of G.enemies) {
+        if (e.hp <= 0) continue;
+        const dx = e.x - d.x, dy = e.y - d.y, dd = Math.hypot(dx, dy) || 1;
+        if (dd < d.ar + e.r) hurt(e, d.dmg, dx / dd * 100, dy / dd * 100);
+      }
+      G.fx.push({ k: 'dust', x: d.x, y: d.y, r: d.ar, life: 0.45, max: 0.45 });
+      G.shake = Math.max(G.shake, 0.12);
+      SFX.boom();
+    }
+    G.drops = G.drops.filter(d => d.t > 0);
+
+    for (const w of G.waves) {
+      w.r += 430 * dt;
+      if (w.r < 0) continue;
+      for (const e of G.enemies) {
+        if (e.hp <= 0 || w.hit.has(e.id)) continue;
+        const dx = e.x - w.x, dy = e.y - w.y, dd = Math.hypot(dx, dy) || 1;
+        if (Math.abs(dd - w.r) < e.r + 10) {
+          w.hit.add(e.id);
+          hurt(e, w.dmg, dx / dd * w.kb, dy / dd * w.kb);
+        }
+      }
+    }
+    G.waves = G.waves.filter(w => w.r < w.maxR);
   }
 
   function updateProjs(dt) {
@@ -744,6 +830,7 @@
 
     updateWeapons(dt);
     updateProjs(dt);
+    updateAreaAttacks(dt);
     updateEnemies(dt);
     updatePickups(dt);
 
@@ -934,6 +1021,13 @@
         ctx.beginPath(); ctx.arc(pr.x, pr.y, 4, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#b8b8c0';
         ctx.fillRect(Math.round(pr.x - 2), Math.round(pr.y - 2), 2, 2);
+      } else if (pr.k === 'bullet') {
+        const v = Math.hypot(pr.vx, pr.vy) || 1;
+        ctx.strokeStyle = 'rgba(255,240,170,.9)';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(pr.x - pr.vx / v * 18, pr.y - pr.vy / v * 18); ctx.lineTo(pr.x, pr.y); ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(Math.round(pr.x - 1.5), Math.round(pr.y - 1.5), 3, 3);
       } else if (pr.k === 'axe') {
         Sprites.draw(ctx, 'handaxe', pr.x, pr.y, pr.size / 24, 0, false, false, pr.rot);
       } else if (pr.k === 'rocket') {
@@ -945,6 +1039,28 @@
         ctx.beginPath(); ctx.moveTo(-12, 0); ctx.lineTo(-20 - Math.random() * 6, -3); ctx.lineTo(-20 - Math.random() * 6, 3); ctx.fill();
         ctx.restore();
       }
+    }
+
+    // 거중기 돌: 떨어질 자리에 그림자, 위에서 밧줄에 매달린 돌이 내려온다
+    for (const d of G.drops) {
+      const k = d.t / d.max;
+      ctx.fillStyle = `rgba(60,30,10,${0.15 + (1 - k) * 0.3})`;
+      ctx.beginPath(); ctx.ellipse(d.x, d.y + 6, d.ar * (1 - k * 0.5), d.ar * 0.35 * (1 - k * 0.5), 0, 0, Math.PI * 2); ctx.fill();
+      const sy = d.y - k * 160;
+      ctx.strokeStyle = 'rgba(217,196,138,.8)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(d.x, sy - 200); ctx.lineTo(d.x, sy - 12); ctx.stroke();
+      Sprites.draw(ctx, 'stone', d.x, sy, 1.6);
+    }
+    // 만세 함성 파동
+    for (const w of G.waves) {
+      if (w.r <= 0) continue;
+      const k = 1 - w.r / w.maxR;
+      ctx.strokeStyle = `rgba(255,243,176,${0.85 * k})`;
+      ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = `rgba(209,48,58,${0.5 * k})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(w.x, w.y, w.r - 5, 0, Math.PI * 2); ctx.stroke();
     }
 
     // 청동 거울
@@ -981,6 +1097,9 @@
       } else if (f.k === 'boom') {
         ctx.fillStyle = `rgba(255, ${Math.floor(140 + 80 * k)}, 60, ${0.55 * k})`;
         ctx.beginPath(); ctx.arc(f.x, f.y, f.r * (1.1 - 0.4 * k), 0, Math.PI * 2); ctx.fill();
+      } else if (f.k === 'dust') {
+        ctx.fillStyle = `rgba(170,140,100,${0.5 * k})`;
+        ctx.beginPath(); ctx.ellipse(f.x, f.y + 4, f.r * (1.15 - 0.3 * k), f.r * 0.45 * (1.15 - 0.3 * k), 0, 0, Math.PI * 2); ctx.fill();
       } else if (f.k === 'smoke') {
         ctx.fillStyle = `rgba(200,200,200,${0.35 * k})`;
         ctx.beginPath(); ctx.arc(f.x, f.y, (3 + (1 - k) * 4) * (f.big ? 2.2 : 1), 0, Math.PI * 2); ctx.fill();
