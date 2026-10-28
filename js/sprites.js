@@ -1035,6 +1035,15 @@
     g.restore();
   }
 
+  function coin() {          // 상평통보: 가운데 네모난 구멍이 뚫린 엽전
+    circ(0, 0, 11, rad(0, 0, 11, '#c99a4a'), 1.8);
+    g.strokeStyle = 'rgba(90,55,15,.6)'; g.lineWidth = 1;
+    g.beginPath(); g.arc(0, 0, 8.6, 0, TAU); g.stroke();
+    rr(-3.2, -3.2, 6.4, 6.4, 0.6, '#3a2a18', 1.2);
+    g.fillStyle = 'rgba(90,55,15,.75)';
+    for (const [x, y] of [[0, -6.2], [0, 6.2], [-6.2, 0], [6.2, 0]]) g.fillRect(x - 1.1, y - 1.1, 2.2, 2.2);
+    ell(-4.5, -5, 2.4, 1.1, 'rgba(255,250,220,.6)', 0, -0.7);
+  }
   function songpyeon() {
     ell(0, 6, 14, 4.5, lin(-14, 2, 14, 10, '#d9d2c2'), 1.5);                 // 접시
     for (const [x, y, c] of [[-6, 2, '#f4f0e6'], [5, 2, '#f2a7b8'], [0, -3, '#9cc97a']]) {
@@ -1276,6 +1285,7 @@
     chongtong: { draw: chongtong, still: true },
     ...Object.fromEntries(Object.entries(icons).map(([k, fn]) => ['ic_' + k, { draw: fn, still: true }])),
     songpyeon: { draw: songpyeon, still: true },
+    coin: { draw: coin, still: true },
     magnet: { draw: magnet, still: true },
     handaxe: { draw: () => handaxeShape(0, 0, 1), still: true },
     mirror: { draw: mirror },
@@ -1424,7 +1434,7 @@
       return url;
     },
     // 초상화: 게임 속과 같은 픽셀 스프라이트를 정수배로 키워 그린다
-    portrait(canvas, key, phase = 0, scale = 1.7) {
+    portrait(canvas, key, phase = 0, scale = 1.7, silhouette = false) {
       const ctx2 = canvas.getContext('2d');
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const W = canvas.clientWidth || canvas.width, Hh = canvas.clientHeight || canvas.height;
@@ -1440,6 +1450,12 @@
       const w = bw * k, h = bh * k;
       ctx2.imageSmoothingEnabled = false;
       ctx2.drawImage(c, bx, by, bw, bh, Math.round((canvas.width - w) / 2), Math.round(canvas.height - h - canvas.height * 0.03), w, h);
+      if (silhouette) {                       // 아직 열리지 않은 영웅은 그림자로
+        ctx2.globalCompositeOperation = 'source-atop';
+        ctx2.fillStyle = 'rgba(120,108,92,.95)';
+        ctx2.fillRect(0, 0, canvas.width, canvas.height);
+        ctx2.globalCompositeOperation = 'source-over';
+      }
     },
   };
 })();

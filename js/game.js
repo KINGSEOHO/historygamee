@@ -200,6 +200,16 @@
   };
   const erasFor = unit => ERAS.filter(e => e.unit <= unit).length;
 
+  // 시대 따라가기: 한 시대 = 1막·2막·3막(각 ACT_LEN초) + 적장
+  const ACT_LEN = 50;
+  const stageOpen = k => ERAS[k].unit <= unit && (k === 0 || cleared(k - 1));
+  // 시대마다 새로 Lv 1에서 시작하므로, 뒤 시대 적의 기본 능력치를 첫 시대 기준으로 맞추고 조금씩만 올린다
+  const avgOf = (list, key) => list.reduce((sum, e) => sum + e[key], 0) / list.length;
+  const STAGE_NORM = ERAS.map((e, k) => ({
+    hp: avgOf(ERAS[0].enemies, 'hp') * (1 + 0.15 * k) / avgOf(e.enemies, 'hp'),
+    dmg: avgOf(ERAS[0].enemies, 'dmg') * (1 + 0.08 * k) / avgOf(e.enemies, 'dmg'),
+  }));
+
   // ── 영웅 ──────────────────────────────────────────────
   const HEROES = [
     { id: 'dol', name: '돌이', title: '구석기 소년', start: 'axe', perk: '이동 속도 +15%', mods: { speed: 0.15 },
@@ -222,8 +232,44 @@
       desc: '대한 의군 참모중장으로 싸웠고, 1909년 하얼빈에서 이토 히로부미를 처단했어요.' },
   ];
   const heroById = id => HEROES.find(h => h.id === id) || HEROES[0];
+
+  // ── 진행 저장 (이 브라우저에만 남는다) ──────────────────
+  const SAVE_KEY = 'hs-save-v1';
+  const openAll = params.get('open') === 'all';          // 선생님 시연용: 모든 시대·영웅·무기 열기
+  const save = (() => {
+    const base = { coins: 0, stars: {}, forge: {} };
+    try { return { ...base, ...JSON.parse(localStorage.getItem(SAVE_KEY) || '{}') }; } catch (e) { return base; }
+  })();
+  function writeSave() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* 저장할 수 없으면 이번에만 유지 */ }
+  }
+  const starsOf = era => save.stars[era] || 0;
+  const cleared = era => openAll || starsOf(era) > 0;
+
+  // 시대를 깨면 열리는 영웅과 무기 (-1: 처음부터 열림)
+  const HERO_UNLOCK = { dol: -1, dangun: -1, jumong: 0, yusin: 0, sejong: 3, sunsin: 3, jeong: 4, gwansun: 5, junggeun: 5 };
+  const WEAPON_UNLOCK = { axe: -1, sword: -1, arrow: 0, bell: 0, mirror: 1, rocket: 3, gun: 3, crane: 4, shout: 5, rifle: 5 };
+  const heroOpen = id => HERO_UNLOCK[id] < 0 || cleared(HERO_UNLOCK[id]);
+  const weaponOpen = id => WEAPON_UNLOCK[id] < 0 || cleared(WEAPON_UNLOCK[id]);
+  const unlockText = req => `「${ERAS[req].name}」 시대를 깨면 열려요`;
+
+  // 대장간: 엽전으로 올리는 영구 강화
+  const FORGE = [
+    { id: 'power', name: '힘', icon: 'ic_powder', per: '공격력 +8%', max: 5 },
+    { id: 'vital', name: '체력', icon: 'ic_ginseng', per: '최대 체력 +10', max: 5 },
+    { id: 'swift', name: '빠르기', icon: 'ic_shoes', per: '이동 속도 +5%', max: 5 },
+    { id: 'reach', name: '줍기', icon: 'ic_jige', per: '획득 범위 +15%', max: 5 },
+    { id: 'wisdom', name: '지혜', icon: 'ic_scroll', per: '경험치 +5%', max: 5 },
+    { id: 'mend', name: '회복', icon: 'songpyeon', per: '초당 체력 +0.3', max: 5 },
+    { id: 'guard', name: '막기', icon: 'ic_armor', per: '받는 피해 -1', max: 3, req: 3 },
+    { id: 'tempo', name: '간격', icon: 'ic_sundial', per: '재사용 대기시간 -4%', max: 5, req: 4 },
+  ];
+  const FORGE_COST = [60, 120, 200, 320, 480];
+  const forgeLv = id => save.forge[id] || 0;
+
   let heroId = 'dangun';
   try { heroId = heroById(localStorage.getItem('hs-hero') || heroId).id; } catch (e) { /* 저장소를 쓸 수 없으면 기본값 */ }
+  if (!heroOpen(heroId)) heroId = 'dangun';
 
   // ── 강화(무기/유물) 정의 ─────────────────────────────
   const MAX_LV = 5;
@@ -300,20 +346,24 @@
 
   // ── 게임 상태 ─────────────────────────────────────────
   let G = null;
-  let state = 'title';   // title | play | quiz | upgrade | paused | over
+  let state = 'title';   // title | map | prep | forge | story | play | quiz | upgrade | paused | over
+  let mode = 'stage';    // stage: 시대 따라가기, free: 6분 도전
+  let stageIdx = 0;
+  let startWeapon = 'sword';
   let eid = 0;
 
   function xpFor(lv) { return Math.floor(8 + lv * 3 + lv * lv * 0.35); }
 
   function newGame() {
     G = {
-      t: 0, era: -1, eraCount: erasFor(unit), eraLen: GOAL / erasFor(unit), kills: 0, level: 1, xp: 0, xpNeed: xpFor(1), pendingLv: 0, pendingChest: 0,
+      mode, t: 0, era: mode === 'stage' ? stageIdx : -1, eraCount: erasFor(unit), eraLen: GOAL / erasFor(unit),
+      act: 0, bossPhase: false, winAt: 0, kills: 0, level: 1, xp: 0, xpNeed: xpFor(1), pendingLv: 0, pendingChest: 0,
       player: {
         x: 0, y: 0, r: 15, hp: 100, maxHp: 100, baseSpeed: 165, speed: 165, armor: 0, magnet: 70,
         regen: 0, dmgMul: 1, cdMul: 1, xpMul: 1, inv: 0, fx: 1, fy: 0, face: 1, anim: 0,
       },
       hero: heroById(heroId),
-      weapons: { [heroById(heroId).start]: 1 }, passives: {}, timers: {},
+      weapons: { [startWeapon]: 1 }, passives: {}, timers: {},
       enemies: [], projs: [], drops: [], waves: [], gems: [], items: [], fx: [], texts: [],
       spawnT: 1, waveT: 25, bossSpawned: {}, mirrorAng: 0,
       quizRight: 0, quizTotal: 0, wrongNote: [], usedQ: new Set(), stdStats: {},
@@ -327,15 +377,15 @@
   function recomputeStats() {
     const p = G.player;
     const oldMax = p.maxHp;
-    const m = G.hero.mods;
-    p.speed = p.baseSpeed * (1 + 0.1 * (G.passives.shoes || 0) + (m.speed || 0));
-    p.armor = (G.passives.armor || 0) + (m.armor || 0);
-    p.magnet = 70 * (1 + 0.35 * (G.passives.jige || 0) + (m.magnet || 0));
-    p.xpMul = 1 + 0.1 * (G.passives.book || 0) + (m.xp || 0);
-    p.maxHp = 100 + 20 * (G.passives.ginseng || 0) + (m.hp || 0);
-    p.regen = 0.5 * (G.passives.ginseng || 0) + (m.regen || 0);
-    p.dmgMul = 1 + 0.12 * (G.passives.powder || 0) + (m.dmg || 0);
-    p.cdMul = 1 - 0.08 * (G.passives.sundial || 0) - (m.cd || 0);
+    const m = G.hero.mods, f = forgeLv;
+    p.speed = p.baseSpeed * (1 + 0.1 * (G.passives.shoes || 0) + (m.speed || 0) + 0.05 * f('swift'));
+    p.armor = (G.passives.armor || 0) + (m.armor || 0) + f('guard');
+    p.magnet = 70 * (1 + 0.35 * (G.passives.jige || 0) + (m.magnet || 0) + 0.15 * f('reach'));
+    p.xpMul = 1 + 0.1 * (G.passives.book || 0) + (m.xp || 0) + 0.05 * f('wisdom');
+    p.maxHp = 100 + 20 * (G.passives.ginseng || 0) + (m.hp || 0) + 10 * f('vital');
+    p.regen = 0.5 * (G.passives.ginseng || 0) + (m.regen || 0) + 0.3 * f('mend');
+    p.dmgMul = 1 + 0.12 * (G.passives.powder || 0) + (m.dmg || 0) + 0.08 * f('power');
+    p.cdMul = 1 - 0.08 * (G.passives.sundial || 0) - (m.cd || 0) - 0.04 * f('tempo');
     if (p.maxHp > oldMax) p.hp += p.maxHp - oldMax;
     p.hp = Math.min(p.hp, p.maxHp);
   }
@@ -371,8 +421,15 @@
   function onKeyCommand(e) {
     const n = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Numpad1: 0, Numpad2: 1, Numpad3: 2, Numpad4: 3 }[e.code];
     const confirm = e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter';
-    if (state === 'title' && confirm) startGame();
-    else if (state === 'play' && (e.code === 'Escape' || e.code === 'KeyP')) pauseGame();
+    const esc = e.code === 'Escape';
+    if (state === 'title' && confirm) openMap();
+    else if (state === 'map' && confirm && stageOpen(mapSel)) openPrep('stage', mapSel);
+    else if (state === 'map' && esc) goTitle();
+    else if (state === 'prep' && confirm) startGame();
+    else if (state === 'prep' && esc) (mode === 'stage' ? openMap() : goTitle());
+    else if (state === 'forge' && esc) goTitle();
+    else if (state === 'story' && confirm) closeStory();
+    else if (state === 'play' && (esc || e.code === 'KeyP')) pauseGame();
     else if (state === 'paused' && (e.code === 'Escape' || e.code === 'KeyP')) resumeGame();
     else if (state === 'quiz') {
       if (quiz && !quiz.answered && n !== undefined && n < quiz.order.length) answerQuiz(n);
@@ -380,7 +437,7 @@
     } else if (state === 'upgrade' && n !== undefined) {
       const btn = $('up-cards').children[n];
       if (btn) btn.click();
-    } else if (state === 'over' && confirm) startGame();
+    } else if (state === 'over' && confirm) { leaveGame(); startGame(); }
   }
 
   function moveInput() {
@@ -404,11 +461,15 @@
 
   function makeEnemy(type, x, y, boss = false) {
     const hpMul = boss ? 1 + G.t / 900 : 1 + G.t / 260;
+    const stage = G.mode === 'stage';
+    let hp = type.hp, dmg = type.dmg;
+    if (stage && boss) { hp = 1100 * (1 + 0.2 * G.era); dmg = 16 * (1 + 0.08 * G.era); }
+    else if (stage) { hp *= STAGE_NORM[G.era].hp; dmg *= STAGE_NORM[G.era].dmg; }
     return {
       id: ++eid, x, y, r: type.r, name: type.name, sprite: type.sprite, boss, anim: Math.random(), face: 1,
-      hp: type.hp * hpMul, maxHp: type.hp * hpMul,
+      hp: hp * hpMul, maxHp: hp * hpMul,
       speed: type.speed * (boss ? 1 : rand(0.88, 1.12)),
-      dmg: type.dmg, xp: type.xp,
+      dmg, xp: type.xp,
       flash: 0, kx: 0, ky: 0, mirrorCd: 0, bellCd: 0,
     };
   }
@@ -442,7 +503,8 @@
     const p = G.player, b = ERAS[era].boss;
     const a = Math.random() * Math.PI * 2, d = spawnDist();
     G.enemies.push(makeEnemy(b, p.x + Math.cos(a) * d, p.y + Math.sin(a) * d, true));
-    showBanner(`⚠ ${b.name} 등장!`, '쓰러뜨리면 보물상자를 얻어요', true);
+    if (G.mode === 'stage') showBanner(`⚠ 적장 ${b.name} 등장!`, '적장을 물리치면 시대를 지켜 내요', true);
+    else showBanner(`⚠ ${b.name} 등장!`, '쓰러뜨리면 보물상자를 얻어요', true);
     SFX.boss();
   }
 
@@ -473,7 +535,10 @@
     G.kills++;
     if (e.boss) {
       G.bossesKilled++;
-      G.items.push({ kind: 'chest', x: e.x, y: e.y, emoji: '🎁' });
+      if (G.mode === 'stage') {
+        G.winAt = G.t + 2.2;
+        showBanner('🏆 적장 격파!', window.STORY[G.era].boss);
+      } else G.items.push({ kind: 'chest', x: e.x, y: e.y, emoji: '🎁' });
       for (let i = 0; i < 12; i++) G.gems.push({ x: e.x + rand(-60, 60), y: e.y + rand(-60, 60), v: Math.ceil(e.xp / 6) });
       G.fx.push({ k: 'boom', x: e.x, y: e.y, r: 120, life: 0.5, max: 0.5 });
       G.shake = 0.4;
@@ -795,16 +860,25 @@
     G.t += dt;
     const p = G.player;
 
-    const era = Math.min(G.eraCount - 1, Math.floor(G.t / G.eraLen));
-    if (era !== G.era) {
-      G.era = era;
-      showBanner(ERAS[era].name, ERAS[era].sub);
-      updateHudEra();
-    }
-    if (G.t >= GOAL) { endGame(true); return; }
-    if (G.t - era * G.eraLen >= G.eraLen * 0.66 && !G.bossSpawned[era]) {
-      G.bossSpawned[era] = true;
-      spawnBoss(era);
+    if (G.mode === 'stage') {
+      if (G.winAt && G.t >= G.winAt) { endGame(true); return; }
+      if (!G.bossPhase) {
+        const act = Math.min(3, Math.floor(G.t / ACT_LEN) + 1);
+        if (act !== G.act) { G.act = act; updateHudEra(); openStory(act); return; }
+        if (G.t >= ACT_LEN * 3) { G.bossPhase = true; updateHudEra(); spawnBoss(G.era); }
+      }
+    } else {
+      const era = Math.min(G.eraCount - 1, Math.floor(G.t / G.eraLen));
+      if (era !== G.era) {
+        G.era = era;
+        showBanner(ERAS[era].name, ERAS[era].sub);
+        updateHudEra();
+      }
+      if (G.t >= GOAL) { endGame(true); return; }
+      if (G.t - era * G.eraLen >= G.eraLen * 0.66 && !G.bossSpawned[era]) {
+        G.bossSpawned[era] = true;
+        spawnBoss(era);
+      }
     }
 
     const [mx, my] = moveInput();
@@ -1155,7 +1229,8 @@
   function setText(el, key, v) { if (lastHud[key] !== v) { lastHud[key] = v; el.textContent = v; } }
   function updateHud() {
     const p = G.player;
-    setText(hud.time, 'time', fmtTime(Math.max(0, GOAL - G.t)));
+    if (G.mode === 'stage') setText(hud.time, 'time', G.bossPhase ? '적장!' : fmtTime(Math.max(0, ACT_LEN * G.act - G.t)));
+    else setText(hud.time, 'time', fmtTime(Math.max(0, GOAL - G.t)));
     setText(hud.kills, 'kills', `💀 ${G.kills}`);
     setText(hud.quiz, 'quiz', `📖 ${G.quizRight} / ${G.quizTotal}`);
     setText(hud.lv, 'lv', `Lv ${G.level}`);
@@ -1163,7 +1238,10 @@
     hud.xp.style.width = `${clamp(G.xp / G.xpNeed, 0, 1) * 100}%`;
     hud.hp.style.width = `${clamp(p.hp / p.maxHp, 0, 1) * 100}%`;
   }
-  function updateHudEra() { setText(hud.era, 'era', `${ERAS[G.era].name} (${G.era + 1}/${G.eraCount})`); }
+  function updateHudEra() {
+    if (G.mode === 'stage') setText(hud.era, 'era', `${ERAS[G.era].name} · ${G.bossPhase ? '적장' : G.act + '막'}`);
+    else setText(hud.era, 'era', `${ERAS[G.era].name} (${G.era + 1}/${G.eraCount})`);
+  }
   function iconHtml(id) {
     const u = UPGRADES[id];
     return u.icon ? `<img class="px-icon" src="${Sprites.iconURL(u.icon)}" alt="">` : u.emoji;
@@ -1193,12 +1271,14 @@
   }
 
   // ── 화면 전환 ─────────────────────────────────────────
-  const SCREENS = ['screen-title', 'screen-quiz', 'screen-upgrade', 'screen-pause', 'screen-over'];
+  const SCREENS = ['screen-title', 'screen-map', 'screen-prep', 'screen-forge', 'screen-story',
+    'screen-quiz', 'screen-upgrade', 'screen-pause', 'screen-over'];
   function showScreen(id) {
     for (const s of SCREENS) $(s).classList.toggle('hidden', s !== id);
   }
 
   function startGame() {
+    if (!heroOpen(heroId) || !weaponOpen(startWeapon)) return;
     SFX.ensure();
     newGame();
     state = 'play';
@@ -1206,6 +1286,7 @@
     $('hud').classList.remove('hidden');
     for (const k in lastHud) delete lastHud[k];
     updateInv();
+    if (G.mode === 'stage') updateHudEra();
     lastTime = performance.now();
   }
 
@@ -1222,12 +1303,199 @@
     showScreen(null);
     lastTime = performance.now();
   }
-  function goTitle() {
-    state = 'title';
+  function leaveGame() {
     G = null;
     $('hud').classList.add('hidden');
     $('banner').classList.add('hidden');
+  }
+  function goTitle() {
+    leaveGame();
+    state = 'title';
+    refreshHome();
     showScreen('screen-title');
+  }
+
+  // 막을 시작할 때 교과서 핵심 내용을 먼저 읽는다
+  function openStory(act) {
+    state = 'story';
+    joy.active = false;
+    const st = window.STORY[G.era];
+    $('story-tag').textContent = `${act}막`;
+    $('story-era').textContent = `${ERAS[G.era].name} · ${ERAS[G.era].std}`;
+    $('story-title').textContent = act === 1 ? st.title : `${ERAS[G.era].name} ${act}막`;
+    $('story-intro').textContent = act === 1 ? st.intro : '';
+    $('story-intro').classList.toggle('hidden', act !== 1);
+    $('story-text').textContent = st.acts[act - 1];
+    showScreen('screen-story');
+  }
+  function closeStory() {
+    if (state !== 'story') return;
+    state = 'play';
+    showScreen(null);
+    if (G.act > 1) showBanner(`${G.act}막`, G.act === 3 ? '마지막 막을 버티면 적장이 나타나요' : '적이 더 많이 몰려와요');
+    lastTime = performance.now();
+  }
+
+  // ── 처음 화면 / 지도 / 출정 준비 / 대장간 ───────────────
+  const coinImg = () => `<img class="px-icon" src="${Sprites.iconURL('coin')}" alt="">`;
+  const starStr = n => '★'.repeat(n) + '☆'.repeat(3 - n);
+
+  function refreshHome() {
+    $('coin-icon').src = Sprites.iconURL('coin');
+    $('coin-count').textContent = save.coins;
+    const inRange = ERAS.filter(e => e.unit <= unit).length;
+    const done = ERAS.filter((e, k) => e.unit <= unit && cleared(k)).length;
+    $('map-progress').textContent = `깬 시대 ${done} / ${inRange}${openAll ? ' · 선생님 모드' : ''}`;
+  }
+
+  let mapSel = 0;
+  function openMap() {
+    leaveGame();
+    state = 'map';
+    // 아직 못 깬 열린 시대 중 첫 번째를 고른다
+    const open = ERAS.map((e, k) => k).filter(stageOpen);
+    mapSel = open.find(k => !cleared(k)) ?? open[open.length - 1] ?? 0;
+    renderMap();
+    showScreen('screen-map');
+  }
+  function renderMap() {
+    const list = $('stage-list');
+    list.innerHTML = '';
+    let total = 0;
+    ERAS.forEach((e, k) => {
+      total += starsOf(k);
+      const open = stageOpen(k);
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="stage${open ? '' : ' locked'}${k === mapSel ? ' on' : ''}">
+          <span class="st-no">${k + 1}</span>
+          <span class="st-main"><span class="st-name">${e.name}</span><span class="st-sub">${e.unit}단원 · ${e.std}</span></span>
+          <span class="st-stars">${open ? starStr(starsOf(k)) : '🔒'}</span>
+        </button>`;
+      li.firstElementChild.addEventListener('click', () => { mapSel = k; renderMap(); });
+      list.appendChild(li);
+    });
+    $('map-stars').textContent = `★ ${total} / ${ERAS.length * 3}`;
+
+    const k = mapSel, e = ERAS[k], st = window.STORY[k], open = stageOpen(k);
+    const got = starsOf(k);
+    const why = e.unit > unit ? `수업 설정에서 ${e.unit}단원까지 고르면 열려요` : `앞 시대 「${ERAS[k - 1]?.name}」를 먼저 깨요`;
+    $('stage-detail').innerHTML = `
+      <div class="sd-head"><img class="sd-boss" src="${Sprites.iconURL(e.boss.sprite, 1.1)}" alt="">
+        <div><div class="sd-era">${e.unit}단원 · ${e.std}</div><div class="sd-name">${e.name} · ${st.title}</div>
+        <div class="sd-gen">적장 <b>${e.boss.name}</b></div></div></div>
+      <p class="sd-intro">${st.intro}</p>
+      <ul class="sd-goals">
+        <li class="${got >= 1 ? 'got' : ''}">★ 세 막을 버티고 적장 물리치기</li>
+        <li class="${got >= 2 ? 'got' : ''}">★ 퀴즈 80% 이상 맞히기</li>
+        <li class="${got >= 3 ? 'got' : ''}">★ 틀린 답 1번 이하</li>
+      </ul>
+      ${open ? '<button id="sd-go" class="primary">출정 준비 (Enter)</button>' : `<p class="sd-lock">🔒 ${why}</p>`}`;
+    if (open) $('sd-go').addEventListener('click', () => openPrep('stage', k));
+  }
+
+  function openPrep(m, k = 0) {
+    leaveGame();
+    mode = m;
+    stageIdx = k;
+    state = 'prep';
+    $('prep-title').textContent = m === 'stage' ? `출정 준비 · ${ERAS[k].name}` : '출정 준비 · 6분 도전';
+    if (!heroOpen(heroId)) heroId = 'dangun';
+    setHero(heroId);
+    showScreen('screen-prep');
+  }
+
+  const heroList = $('hero-list');
+  for (const h of HEROES) {
+    const b = document.createElement('button');
+    b.className = 'hero-btn';
+    b.dataset.hero = h.id;
+    b.innerHTML = `<canvas></canvas><span>${h.name}</span>`;
+    b.addEventListener('click', () => setHero(h.id));
+    heroList.appendChild(b);
+  }
+  function setHero(id) {
+    const h = heroById(id);
+    heroId = h.id;
+    const open = heroOpen(h.id);
+    if (open) { try { localStorage.setItem('hs-hero', h.id); } catch (e) { /* 무시 */ } }
+    for (const b of heroList.children) {
+      b.classList.toggle('on', b.dataset.hero === h.id);
+      b.classList.toggle('locked', !heroOpen(b.dataset.hero));
+      b.firstChild.drawn = false;
+    }
+    $('hero-name').textContent = open ? h.name : `🔒 ${h.name}`;
+    $('hero-title').textContent = h.title;
+    $('hero-desc').textContent = open ? h.desc : `${unlockText(HERO_UNLOCK[h.id])}. ${h.desc}`;
+    $('hero-perk').textContent = `특성 · ${h.perk}`;
+    // 영웅을 바꾸면 그 영웅의 대표 무기를 먼저 골라 둔다
+    startWeapon = weaponOpen(h.start) ? h.start : WEAPON_IDS.find(weaponOpen);
+    renderWeapons();
+  }
+  function renderWeapons() {
+    const box = $('weapon-list');
+    box.innerHTML = '';
+    for (const id of WEAPON_IDS) {
+      const u = UPGRADES[id], open = weaponOpen(id);
+      const b = document.createElement('button');
+      b.className = 'weapon-btn' + (id === startWeapon ? ' on' : '') + (open ? '' : ' locked');
+      b.title = open ? u.desc[0] : unlockText(WEAPON_UNLOCK[id]);
+      b.innerHTML = `${open ? iconHtml(id) : '🔒'}<span>${u.name}</span>`;
+      if (open) b.addEventListener('click', () => { startWeapon = id; renderWeapons(); });
+      box.appendChild(b);
+    }
+    const ok = heroOpen(heroId) && weaponOpen(startWeapon);
+    $('btn-go').disabled = !ok;
+    $('btn-go').textContent = ok ? `출발! · ${UPGRADES[startWeapon].name} (Enter)` : '잠긴 영웅이에요';
+  }
+  function drawHeroPortraits(t) {
+    for (const b of heroList.children) {
+      const on = b.dataset.hero === heroId;
+      const c = b.firstChild;
+      if (!c.drawn || on || c.wasOn) {
+        Sprites.portrait(c, b.dataset.hero, on ? (t * 1.6) % 1 : 0, 1.7, !heroOpen(b.dataset.hero));
+        c.drawn = true;
+        c.wasOn = on;
+      }
+    }
+    Sprites.portrait($('hero-portrait'), heroId, (t * 1.6) % 1, 1.7, !heroOpen(heroId));
+  }
+
+  function openForge() {
+    state = 'forge';
+    renderForge();
+    showScreen('screen-forge');
+  }
+  function renderForge() {
+    $('forge-coins').textContent = save.coins;
+    for (const img of document.querySelectorAll('.coin-img')) img.src = Sprites.iconURL('coin');
+    const box = $('forge-list');
+    box.innerHTML = '';
+    for (const f of FORGE) {
+      const lv = forgeLv(f.id), locked = f.req !== undefined && !cleared(f.req);
+      const cost = FORGE_COST[lv], max = lv >= f.max;
+      const row = document.createElement('div');
+      row.className = 'forge-row' + (locked ? ' locked' : '');
+      row.innerHTML = `<img class="px-icon" src="${Sprites.iconURL(f.icon)}" alt="">
+        <div class="fr-text"><b>${f.name}</b> <span>${f.per}</span>
+          <div class="pips">${Array.from({ length: f.max }, (_, i) => `<i class="${i < lv ? 'on' : ''}"></i>`).join('')}</div></div>`;
+      const btn = document.createElement('button');
+      if (locked) { btn.disabled = true; btn.textContent = '🔒'; btn.title = unlockText(f.req); row.querySelector('.fr-text span').textContent = unlockText(f.req); }
+      else if (max) { btn.disabled = true; btn.textContent = '최고'; }
+      else {
+        btn.innerHTML = `올리기 ${coinImg()} ${cost}`;
+        btn.disabled = save.coins < cost;
+        btn.addEventListener('click', () => {
+          if (save.coins < cost) return;
+          save.coins -= cost;
+          save.forge[f.id] = lv + 1;
+          writeSave();
+          SFX.pickup();
+          renderForge();
+        });
+      }
+      row.appendChild(btn);
+      box.appendChild(row);
+    }
   }
 
   // ── 퀴즈 ──────────────────────────────────────────────
@@ -1244,7 +1512,7 @@
       pool = avail;
     }
     const current = pool.filter(q => q.era === G.era);
-    const q = current.length && Math.random() < 0.6 ? pick(current) : pick(pool);
+    const q = current.length && Math.random() < (G.mode === 'stage' ? 0.75 : 0.6) ? pick(current) : pick(pool);
     G.usedQ.add(q.id);
     return q;
   }
@@ -1329,7 +1597,8 @@
 
   // ── 강화 선택 ─────────────────────────────────────────
   function upgradeOptions(n) {
-    const cands = Object.keys(UPGRADES).filter(id => lvOf(id) < MAX_LV);
+    const cands = Object.keys(UPGRADES).filter(id => lvOf(id) < MAX_LV &&
+      (G.mode !== 'stage' || UPGRADES[id].type !== 'w' || weaponOpen(id)));
     // 무기가 적을 때는 새 무기가 조금 더 잘 나오도록
     const weighted = [];
     for (const id of cands) {
@@ -1388,17 +1657,68 @@
   function endGame(win) {
     state = 'over';
     joy.active = false;
-    $('over-title').textContent = win ? '🏆 생존 성공!' : '💀 쓰러졌습니다';
-    $('over-sub').textContent = win
-      ? `${ERAS[0].name}부터 ${ERAS[G.eraCount - 1].name}까지 모든 시대를 지켜 냈어요!`
-      : `${ERAS[Math.max(0, G.era)].name}에서 쓰러졌어요. 다시 도전해 보세요!`;
+    const stage = G.mode === 'stage';
+    const era = Math.max(0, G.era);
+
+    // 엽전과 별, 새로 열린 것들
+    const heroesBefore = HEROES.filter(h => heroOpen(h.id)).map(h => h.id);
+    const weaponsBefore = WEAPON_IDS.filter(weaponOpen);
+    const nextBefore = era + 1 < ERAS.length && stageOpen(era + 1);
+    let earned = Math.floor(G.kills / 6);
+    let stars = 0;
+    if (stage && win) {
+      const wrong = G.quizTotal - G.quizRight;
+      stars = 1 + (G.quizTotal && G.quizRight / G.quizTotal >= 0.8 ? 1 : 0) + (wrong <= 1 ? 1 : 0);
+      save.stars[era] = Math.max(starsOf(era), stars);
+      earned += 40 + stars * 15;
+    } else if (!stage) {
+      earned += Math.floor(G.t / 6) + (win ? 40 : 0);
+    }
+    save.coins += earned;
+    writeSave();
+    const news = [
+      ...HEROES.filter(h => heroOpen(h.id) && !heroesBefore.includes(h.id)).map(h => `영웅 <b>${h.name}</b>`),
+      ...WEAPON_IDS.filter(id => weaponOpen(id) && !weaponsBefore.includes(id)).map(id => `무기 <b>${UPGRADES[id].name}</b>`),
+      ...(stage && !nextBefore && era + 1 < ERAS.length && stageOpen(era + 1) ? [`시대 <b>${ERAS[era + 1].name}</b>`] : []),
+    ];
+
+    if (stage) {
+      $('over-title').textContent = win ? '🏆 시대를 지켜 냈어요!' : '💀 쓰러졌습니다';
+      $('over-sub').textContent = win
+        ? `${ERAS[era].name}의 적장 ${ERAS[era].boss.name}을(를) 물리쳤어요.`
+        : `${ERAS[era].name} ${G.bossPhase ? '적장 앞' : G.act + '막'}에서 쓰러졌어요. 대장간에서 강화하고 다시 도전해 보세요!`;
+    } else {
+      $('over-title').textContent = win ? '🏆 생존 성공!' : '💀 쓰러졌습니다';
+      $('over-sub').textContent = win
+        ? `${ERAS[0].name}부터 ${ERAS[G.eraCount - 1].name}까지 모든 시대를 지켜 냈어요!`
+        : `${ERAS[era].name}에서 쓰러졌어요. 다시 도전해 보세요!`;
+    }
+    const starBox = $('over-stars');
+    starBox.classList.toggle('hidden', !stage);
+    if (stage) {
+      const wrong = G.quizTotal - G.quizRight;
+      const rows = [
+        [win, '적장 물리치기'],
+        [win && G.quizTotal > 0 && G.quizRight / G.quizTotal >= 0.8, `퀴즈 80% 이상 (${G.quizRight}/${G.quizTotal})`],
+        [win && wrong <= 1, `틀린 답 1번 이하 (${wrong}번)`],
+      ];
+      starBox.innerHTML = `<div class="big-stars">${starStr(stars)}</div>` +
+        rows.map(([ok, t]) => `<div class="${ok ? 'got' : ''}">${ok ? '★' : '☆'} ${t}</div>`).join('');
+    }
+    $('over-reward').innerHTML = `<div>${coinImg()} 엽전 <b>+${earned}</b> (모은 엽전 ${save.coins})</div>` +
+      (news.length ? `<div class="new-unlock">🎉 새로 열렸어요: ${news.join(', ')}</div>` : '');
+
+    const next = era + 1;
+    $('btn-next').classList.toggle('hidden', !(stage && win && next < ERAS.length && stageOpen(next)));
+    $('btn-tomap').classList.toggle('hidden', !stage);
+
     const rate = G.quizTotal ? Math.round(G.quizRight / G.quizTotal * 100) : 0;
     $('over-stats').innerHTML = `
       <div>캐릭터<b>${G.hero.name}</b></div>
-      <div>생존 시간<b>${fmtTime(G.t)}</b></div>
+      <div>${stage ? '버틴 시간' : '생존 시간'}<b>${fmtTime(G.t)}</b></div>
       <div>도달 레벨<b>Lv ${G.level}</b></div>
       <div>처치한 적<b>${G.kills}</b></div>
-      <div>쓰러뜨린 보스<b>${G.bossesKilled}</b></div>
+      <div>쓰러뜨린 ${stage ? '적장' : '보스'}<b>${G.bossesKilled}</b></div>
       <div>퀴즈 정답률<b>${G.quizRight}/${G.quizTotal} (${rate}%)</b></div>`;
     const stds = Object.keys(G.stdStats).sort();
     $('over-std').innerHTML = stds.map(k => {
@@ -1433,6 +1753,7 @@
     const eras = ERAS.filter(e => e.unit <= v);
     $('unit-desc').textContent = `${UNITS[v].desc}\n${eras.map(e => e.name).join(' → ')}`;
     syncUrl();
+    if (typeof refreshHome === 'function') refreshHome();
   }
   function setLevel(v) {
     level = v;
@@ -1445,49 +1766,24 @@
   setUnit(unit);
   setLevel(level);
 
-  // 캐릭터 선택
-  const heroList = $('hero-list');
-  for (const h of HEROES) {
-    const b = document.createElement('button');
-    b.className = 'hero-btn';
-    b.dataset.hero = h.id;
-    b.innerHTML = `<canvas></canvas><span>${h.name}</span>`;
-    b.addEventListener('click', () => setHero(h.id));
-    heroList.appendChild(b);
-  }
-  function setHero(id) {
-    const h = heroById(id);
-    heroId = h.id;
-    try { localStorage.setItem('hs-hero', h.id); } catch (e) { /* 무시 */ }
-    for (const b of heroList.children) b.classList.toggle('on', b.dataset.hero === h.id);
-    $('hero-name').textContent = h.name;
-    $('hero-title').textContent = h.title;
-    $('hero-desc').textContent = h.desc;
-    $('hero-weapon').innerHTML = `시작 무기 ${iconHtml(h.start)} ${UPGRADES[h.start].name}`;
-    $('hero-perk').textContent = `특성 · ${h.perk}`;
-  }
-  function drawHeroPortraits(t) {
-    for (const b of heroList.children) {
-      const on = b.dataset.hero === heroId;
-      const c = b.firstChild;
-      if (!c.drawn || on || c.wasOn) {
-        Sprites.portrait(c, b.dataset.hero, on ? (t * 1.6) % 1 : 0);
-        c.drawn = true;
-        c.wasOn = on;
-      }
-    }
-    Sprites.portrait($('hero-portrait'), heroId, (t * 1.6) % 1);
-  }
-  setHero(heroId);
-
-  $('btn-start').addEventListener('click', startGame);
-  $('btn-retry').addEventListener('click', startGame);
+  $('btn-map').addEventListener('click', openMap);
+  $('btn-forge').addEventListener('click', openForge);
+  $('btn-free').addEventListener('click', () => openPrep('free'));
+  $('map-back').addEventListener('click', goTitle);
+  $('forge-back').addEventListener('click', goTitle);
+  $('prep-back').addEventListener('click', () => (mode === 'stage' ? openMap() : goTitle()));
+  $('btn-go').addEventListener('click', startGame);
+  $('story-go').addEventListener('click', closeStory);
+  $('btn-retry').addEventListener('click', () => { leaveGame(); startGame(); });
+  $('btn-next').addEventListener('click', () => openPrep('stage', stageIdx + 1));
+  $('btn-tomap').addEventListener('click', openMap);
   $('btn-home').addEventListener('click', goTitle);
-  $('btn-quit').addEventListener('click', goTitle);
+  $('btn-quit').addEventListener('click', () => (G && G.mode === 'stage' ? openMap() : goTitle()));
   $('btn-resume').addEventListener('click', resumeGame);
   $('btn-pause').addEventListener('click', () => (state === 'play' ? pauseGame() : resumeGame()));
   $('btn-mute').addEventListener('click', e => { e.currentTarget.textContent = SFX.toggle() ? '🔇' : '🔊'; });
   $('quiz-next').addEventListener('click', afterQuiz);
+  refreshHome();
 
   // ── 메인 루프 ─────────────────────────────────────────
   let lastTime = performance.now();
@@ -1503,7 +1799,7 @@
       if (state === 'play') update(dt);
       render();
       if (G) updateHud();
-      if (state === 'title' && now - lastPortrait > 90) { lastPortrait = now; drawHeroPortraits(now / 1000); }
+      if (state === 'prep' && now - lastPortrait > 90) { lastPortrait = now; drawHeroPortraits(now / 1000); }
     } catch (err) {
       if (frameErrors++ < 5) console.error(err);
       ctx.restore?.();
