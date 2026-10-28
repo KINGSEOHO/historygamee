@@ -1053,7 +1053,7 @@
     }
     // 만세 함성 파동
     for (const w of G.waves) {
-      if (w.r <= 0) continue;
+      if (w.r <= 6) continue;          // 두 번째 파동은 안쪽에서 출발하므로 반지름이 음수가 되지 않게 건너뛴다
       const k = 1 - w.r / w.maxR;
       ctx.strokeStyle = `rgba(255,243,176,${0.85 * k})`;
       ctx.lineWidth = 5;
@@ -1492,15 +1492,22 @@
   // ── 메인 루프 ─────────────────────────────────────────
   let lastTime = performance.now();
   let lastPortrait = 0;
+  let frameErrors = 0;
   function frame(now) {
+    // 다음 프레임을 먼저 예약해 두면, 이번 프레임에서 예외가 나도 게임이 멈추지 않는다
+    requestAnimationFrame(frame);
     // rAF 타임스탬프가 startGame의 performance.now()보다 이를 수 있으므로 음수 방지
     const dt = clamp((now - lastTime) / 1000, 0, 0.05);
     lastTime = now;
-    if (state === 'play') update(dt);
-    if (G) { render(); updateHud(); }
-    else render();
-    if (state === 'title' && now - lastPortrait > 90) { lastPortrait = now; drawHeroPortraits(now / 1000); }
-    requestAnimationFrame(frame);
+    try {
+      if (state === 'play') update(dt);
+      render();
+      if (G) updateHud();
+      if (state === 'title' && now - lastPortrait > 90) { lastPortrait = now; drawHeroPortraits(now / 1000); }
+    } catch (err) {
+      if (frameErrors++ < 5) console.error(err);
+      ctx.restore?.();
+    }
   }
   requestAnimationFrame(frame);
 
