@@ -427,7 +427,7 @@
     else if (state === 'map' && esc) goTitle();
     else if (state === 'prep' && confirm) startGame();
     else if (state === 'prep' && esc) (mode === 'stage' ? openMap() : goTitle());
-    else if (state === 'forge' && esc) goTitle();
+    else if ((state === 'forge' || state === 'backup') && esc) goTitle();
     else if (state === 'story' && confirm) closeStory();
     else if (state === 'play' && (esc || e.code === 'KeyP')) pauseGame();
     else if (state === 'paused' && (e.code === 'Escape' || e.code === 'KeyP')) resumeGame();
@@ -1271,7 +1271,7 @@
   }
 
   // ── 화면 전환 ─────────────────────────────────────────
-  const SCREENS = ['screen-title', 'screen-map', 'screen-prep', 'screen-forge', 'screen-story',
+  const SCREENS = ['screen-title', 'screen-map', 'screen-prep', 'screen-forge', 'screen-backup', 'screen-story',
     'screen-quiz', 'screen-upgrade', 'screen-pause', 'screen-over'];
   function showScreen(id) {
     for (const s of SCREENS) $(s).classList.toggle('hidden', s !== id);
@@ -1653,6 +1653,76 @@
     checkPending();
   }
 
+  // ── 기록 백업 코드: 서버 없이 다른 기기로 기록 옮기기 ──
+  function checksum(str) {
+    let h = 7;
+    for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) % 1679616;   // 36^4
+    return h.toString(36).padStart(4, '0');
+  }
+  function makeCode() {
+    const body = btoa(JSON.stringify({ c: save.coins, s: save.stars, f: save.forge }))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return `HS1-${body}-${checksum(body)}`;
+  }
+  function readCode(text) {
+    const m = /^HS1-([A-Za-z0-9_-]+)-([0-9a-z]{4})$/.exec(text.replace(/\s+/g, ''));
+    if (!m || checksum(m[1]) !== m[2]) return null;
+    try {
+      const b64 = m[1].replace(/-/g, '+').replace(/_/g, '/');
+      const d = JSON.parse(atob(b64 + '='.repeat((4 - b64.length % 4) % 4)));
+      const int = v => (Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0);
+      const stars = {}, forge = {};
+      ERAS.forEach((e, k) => { const v = Math.min(3, int(d.s && d.s[k])); if (v) stars[k] = v; });
+      for (const f of FORGE) { const v = Math.min(f.max, int(d.f && d.f[f.id])); if (v) forge[f.id] = v; }
+      return { coins: int(d.c), stars, forge };
+    } catch (e) { return null; }
+  }
+  const recordSummary = r => {
+    const stars = Object.values(r.stars).reduce((a, b) => a + b, 0);
+    const forge = Object.values(r.forge).reduce((a, b) => a + b, 0);
+    return `별 ${stars}개 · 엽전 ${r.coins} · 강화 ${forge}단계`;
+  };
+  let restorePending = null;
+  function openBackup() {
+    state = 'backup';
+    $('backup-code').value = makeCode();
+    $('backup-summary').textContent = `(${recordSummary(save)})`;
+    $('backup-copy-msg').textContent = '';
+    $('restore-code').value = '';
+    $('restore-msg').textContent = '';
+    restorePending = null;
+    showScreen('screen-backup');
+  }
+  $('backup-copy').addEventListener('click', () => {
+    const box = $('backup-code');
+    const fallback = () => { box.focus(); box.select(); $('backup-copy-msg').textContent = '코드가 선택됐어요. Ctrl+C(휴대기기는 길게 눌러 복사)로 복사해 주세요.'; };
+    try {
+      navigator.clipboard.writeText(box.value)
+        .then(() => { $('backup-copy-msg').textContent = '복사했어요! 메모장이나 공책에 붙여 넣어 두세요.'; })
+        .catch(fallback);
+    } catch (e) { fallback(); }
+  });
+  $('restore-code').addEventListener('input', () => { restorePending = null; $('restore-msg').textContent = ''; $('restore-go').textContent = '불러오기'; });
+  $('restore-go').addEventListener('click', () => {
+    const r = readCode($('restore-code').value);
+    if (!r) { $('restore-msg').textContent = '코드가 올바르지 않아요. HS1- 부터 끝까지 빠짐없이 붙여 넣었는지 확인해 주세요.'; return; }
+    // 지금 기록을 덮어쓰므로 한 번 더 누르게 한다
+    if (!restorePending) {
+      restorePending = r;
+      $('restore-msg').textContent = `이 코드의 기록: ${recordSummary(r)}. 지금 기록 대신 불러오려면 버튼을 한 번 더 누르세요.`;
+      $('restore-go').textContent = '네, 이 기록으로 바꿀게요';
+      return;
+    }
+    Object.assign(save, restorePending);
+    writeSave();
+    restorePending = null;
+    $('restore-go').textContent = '불러오기';
+    $('backup-code').value = makeCode();
+    $('backup-summary').textContent = `(${recordSummary(save)})`;
+    $('restore-msg').textContent = '기록을 불러왔어요!';
+    SFX.pickup();
+  });
+
   // ── 게임 종료 ─────────────────────────────────────────
   function endGame(win) {
     state = 'over';
@@ -1768,6 +1838,8 @@
 
   $('btn-map').addEventListener('click', openMap);
   $('btn-forge').addEventListener('click', openForge);
+  $('btn-backup').addEventListener('click', openBackup);
+  $('backup-back').addEventListener('click', goTitle);
   $('btn-free').addEventListener('click', () => openPrep('free'));
   $('map-back').addEventListener('click', goTitle);
   $('forge-back').addEventListener('click', goTitle);

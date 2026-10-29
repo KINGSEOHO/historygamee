@@ -374,3 +374,16 @@ button.primary:hover { background: #c95539; }
 .new-unlock { background: #e6f4dd; color: #2e6b36; border-radius: 10px; padding: 6px 12px; }
 .btnrow { flex-wrap: wrap; }
 @media (max-width: 420px) { .panel-title { font-size: 19px; } }
+
+/* ── 기록 백업 ─────────────────────── */
+.link-btn { background: none; border: none; color: var(--muted); font-size: 13px; text-decoration: underline; padding: 4px 8px; }
+.link-btn:hover { background: none; color: var(--ink); }
+.backup-panel { width: min(560px, 100%); text-align: left; }
+.backup-label { margin-top: 12px; }
+.backup-panel textarea {
+  width: 100%; font: 13px/1.5 ui-monospace, 'Courier New', monospace; padding: 8px 10px; margin: 6px 0;
+  border: 2px solid var(--panel-edge); border-radius: 10px; background: #fffaf0; color: var(--ink);
+  word-break: break-all; resize: vertical;
+}
+.backup-panel .btnrow { justify-content: flex-start; }
+#restore-msg, #backup-copy-msg { min-height: 1.2em; }
