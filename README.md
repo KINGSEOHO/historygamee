@@ -6,7 +6,11 @@
 
 ## 실행
 
-`play.html`을 브라우저로 열거나, 정적 서버로 띄우면 됩니다.
+**바로 하기: <https://kingseoho.github.io/historygamee/>** (GitHub Pages)
+
+배운 단원에 맞춰 시작하려면 `play.html?unit=1&lv=1`처럼 주소를 붙여 나눠 주세요. 예) <https://kingseoho.github.io/historygamee/play.html?unit=1&lv=1>
+
+직접 띄우려면 `play.html`을 브라우저로 열거나, 정적 서버로 띄우면 됩니다.
 
 ```bash
 python3 -m http.server 8000
